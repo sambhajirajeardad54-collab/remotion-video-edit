@@ -8,3 +8,8 @@ out
 
 # Output of `npm run build`
 build
+
+# Generated presenter cutouts (recreate with scripts/remove-background)
+*.cutout.webm
+presenter-cutout.webm
+scripts/remove-background/modnet.onnx

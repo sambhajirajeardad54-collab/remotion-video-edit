@@ -39,7 +39,7 @@ export type PresenterSceneProps = z.infer<typeof presenterSceneSchema> & {
   faceY?: number;
   // Transparent presenter cutout (background removal), see PresenterMedia.
   foregroundSrc?: string;
-  anchorBottom?: boolean;
+  shiftY?: number;
 };
 
 export const PresenterScene: React.FC<PresenterSceneProps> = ({
@@ -60,7 +60,7 @@ export const PresenterScene: React.FC<PresenterSceneProps> = ({
   sourceAspect,
   faceY,
   foregroundSrc,
-  anchorBottom,
+  shiftY,
 }) => {
   const { durationInFrames } = useVideoConfig();
   const isSplit = layout === "top-half";
@@ -90,7 +90,7 @@ export const PresenterScene: React.FC<PresenterSceneProps> = ({
           containerHeight={isSplit ? height * 0.52 : height}
           faceY={faceY}
           foregroundSrc={foregroundSrc}
-          anchorBottom={anchorBottom}
+          shiftY={shiftY}
         />
         {/* Darken the bottom edge so the name banner stays readable. */}
         <AbsoluteFill

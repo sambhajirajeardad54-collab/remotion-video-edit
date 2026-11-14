@@ -247,8 +247,8 @@ export const MpscHistoryVideo: React.FC = () => {
           sourceAspect={SOURCE_ASPECT}
           faceY={FACE_Y}
           foregroundSrc={CUTOUT}
-          anchorBottom
-          baseZoom={0.8}
+          shiftY={150}
+          baseZoom={1}
           zoom={0.03}
           zoomDurationInFrames={189}
         >
@@ -272,7 +272,7 @@ export const MpscHistoryVideo: React.FC = () => {
                 exitFrame={0}
               />
               <Infographic
-                variant="list"
+                variant="chips"
                 title=""
                 items={[
                   { title: "समाजसुधारक", description: "" },

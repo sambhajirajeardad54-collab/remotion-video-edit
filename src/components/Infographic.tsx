@@ -8,8 +8,9 @@ import { theme } from "./theme";
 //   "steps"       numbered process joined by a line that draws in
 //   "list"        key points with check marks (revision notes, symptoms, tips)
 //   "comparison"  two columns side by side (then vs now, myth vs fact)
+//   "chips"       compact pills that pop in one by one (topics, keywords)
 export const infographicSchema = z.object({
-  variant: z.enum(["steps", "list", "comparison"]),
+  variant: z.enum(["steps", "list", "comparison", "chips"]),
   title: z.string(),
   // Used by "steps" and "list".
   items: z.array(z.object({ title: z.string(), description: z.string() })),
@@ -73,6 +74,7 @@ export const Infographic: React.FC<InfographicProps> = (props) => {
       ) : null}
       {variant === "steps" ? <Steps {...props} /> : null}
       {variant === "list" ? <List {...props} /> : null}
+      {variant === "chips" ? <Chips {...props} /> : null}
       {variant === "comparison" ? <Comparison {...props} /> : null}
     </Interactive.Div>
   );
@@ -160,6 +162,55 @@ const Steps: React.FC<InfographicProps> = ({
               >
                 {item.description}
               </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+const Chips: React.FC<InfographicProps> = ({
+  items,
+  accentColor,
+  listIcon,
+  delay,
+  stagger,
+}) => {
+  const frame = useCurrentFrame();
+  return (
+    <div style={{ display: "flex", flexWrap: "wrap", gap: 20 }}>
+      {items.map((item, i) => {
+        const start = delay + 20 + i * stagger;
+        const pop = progress(frame, start, 14, EASE_POP);
+        const icon = progress(frame, start + 4, 12);
+        return (
+          <div
+            key={`${item.title}-${i}`}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 16,
+              padding: "16px 30px 16px 20px",
+              borderRadius: 999,
+              backgroundColor: "rgba(10,20,40,0.9)",
+              border: `3px solid ${accentColor}`,
+              boxShadow: `0 10px 30px rgba(0,0,0,0.4)`,
+              opacity: Math.min(1, pop * 1.5),
+              scale: `${0.6 + 0.4 * pop}`,
+            }}
+          >
+            <div style={{ width: 52, height: 52 }}>
+              <svg width={52} height={52} viewBox="0 0 64 64">
+                <ListIconPath
+                  kind={listIcon}
+                  color={accentColor}
+                  progress={icon}
+                />
+              </svg>
+            </div>
+            <div style={{ fontSize: 50, fontWeight: 800, lineHeight: 1.2 }}>
+              {item.title}
             </div>
           </div>
         );
@@ -336,4 +387,39 @@ const ListIcon: React.FC<{
     ) : null}
     {kind === "dot" ? <circle cx={32} cy={32} r={10 * p} fill={color} /> : null}
   </svg>
+);
+
+// Icon shapes only (for use inside an existing <svg viewBox="0 0 64 64">).
+const ListIconPath: React.FC<{
+  kind: "check" | "cross" | "dot";
+  color: string;
+  progress: number;
+}> = ({ kind, color, progress: p }) => (
+  <>
+    <circle cx={32} cy={32} r={29} fill="none" stroke={color} strokeWidth={5} />
+    {kind === "check" ? (
+      <path
+        d="M 19 33 L 28 42 L 46 23"
+        fill="none"
+        stroke={color}
+        strokeWidth={6}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeDasharray={45}
+        strokeDashoffset={45 * (1 - p)}
+      />
+    ) : null}
+    {kind === "cross" ? (
+      <path
+        d="M 22 22 L 42 42 M 42 22 L 22 42"
+        fill="none"
+        stroke={color}
+        strokeWidth={6}
+        strokeLinecap="round"
+        strokeDasharray={60}
+        strokeDashoffset={60 * (1 - p)}
+      />
+    ) : null}
+    {kind === "dot" ? <circle cx={32} cy={32} r={10 * p} fill={color} /> : null}
+  </>
 );

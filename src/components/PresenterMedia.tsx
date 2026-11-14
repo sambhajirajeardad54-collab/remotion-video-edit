@@ -39,9 +39,12 @@ export const PresenterMedia: React.FC<{
   // timing as presenterSrc). When set, the original background is replaced
   // by the dark Sam Xplains backdrop with a soft spotlight.
   foregroundSrc?: string;
-  // Zoom around the bottom edge instead of the face (to make the presenter
-  // smaller and lower, leaving room for graphics above).
-  anchorBottom?: boolean;
+  // Move the whole presenter down (px), e.g. to make room for graphics.
+  shiftY?: number;
+  // Cutout only: below this fraction of the source height the original
+  // footage is laid underneath, filling any gaps the background removal left
+  // in the torso (for shots where the body continues to the bottom edge).
+  torsoFillFrom?: number;
 }> = ({
   presenterSrc,
   withAudio,
@@ -56,7 +59,8 @@ export const PresenterMedia: React.FC<{
   containerHeight,
   faceY = 0.36,
   foregroundSrc,
-  anchorBottom = false,
+  shiftY = 0,
+  torsoFillFrom = 0.625,
 }) => {
   const frame = useCurrentFrame();
   const { width } = useVideoConfig();
@@ -76,35 +80,52 @@ export const PresenterMedia: React.FC<{
     originX = 50;
     originY = ((top + faceY * boxH) / containerHeight) * 100;
   }
-  const spotlightY = originY;
-  if (anchorBottom) {
-    originY = 100;
-  }
+  const spotlightY =
+    originY + (containerHeight ? (shiftY / containerHeight) * 100 : 0);
+  const trim = trimBeforeFrames > 0 ? trimBeforeFrames : undefined;
+  const fill = `${torsoFillFrom * 100}%`;
+  const fillSoft = `${(torsoFillFrom + 0.04) * 100}%`;
 
   return (
     <AbsoluteFill style={{ overflow: "hidden" }}>
-      {foregroundSrc ? (
-        <SceneBackground
-          spotlightY={
-            anchorBottom ? 100 - (100 - spotlightY) * scale : spotlightY
-          }
-        />
-      ) : null}
+      {foregroundSrc ? <SceneBackground spotlightY={spotlightY} /> : null}
       <AbsoluteFill
         style={{
           scale: `${scale}`,
           transformOrigin: `${originX}% ${originY}%`,
+          translate: `0px ${shiftY}px`,
         }}
       >
         {presenterSrc ? (
           <div style={boxStyle}>
+            {foregroundSrc ? (
+              <Video
+                name="Presenter torso fill"
+                src={staticFile(presenterSrc)}
+                trimBefore={trim}
+                muted
+                objectFit="cover"
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  width: "100%",
+                  height: "100%",
+                  maskImage: `linear-gradient(180deg, transparent ${fill}, black ${fillSoft})`,
+                }}
+              />
+            ) : null}
             <Video
               name={foregroundSrc ? "Presenter cutout" : "Presenter footage"}
               src={staticFile(foregroundSrc || presenterSrc)}
-              trimBefore={trimBeforeFrames > 0 ? trimBeforeFrames : undefined}
+              trimBefore={trim}
               muted={!withAudio}
               objectFit="cover"
-              style={{ width: "100%", height: "100%" }}
+              style={{
+                position: "absolute",
+                inset: 0,
+                width: "100%",
+                height: "100%",
+              }}
             />
           </div>
         ) : (
