@@ -56,6 +56,7 @@ export const MPSC_HISTORY_TRANSCRIPT: TranscriptLine[] = [
     startSec: 35.6,
     endSec: 41.4,
     text: "तर मित्रांनो, ही इन्फॉर्मेशन तुम्हाला कशी वाटते? ही इन्फॉर्मेशन तुम्हाला फायदेशीर ठरत असेल, तर Sam Xplains चॅनलला फॉलो करायला विसरू नका.",
+    check: '"कशी वाटते" or "कशी वाटली" (machine heard "कशिवाट्ते")',
   },
 ];
 
