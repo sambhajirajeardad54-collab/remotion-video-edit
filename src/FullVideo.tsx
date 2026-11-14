@@ -28,6 +28,7 @@ export const fullVideoSchema = z.object({
   voiceoverVolume: z.number().min(0).max(2),
   musicEnabled: z.boolean(),
   musicVolume: z.number().min(0).max(1),
+  musicDuckedVolume: z.number().min(0).max(1),
   sfxEnabled: z.boolean(),
   sfxVolume: z.number().min(0).max(1),
   voiceoverFound: z.boolean(),
@@ -48,6 +49,7 @@ export const FullVideo: React.FC<FullVideoProps> = ({
   voiceoverVolume,
   musicEnabled,
   musicVolume,
+  musicDuckedVolume,
   sfxEnabled,
   sfxVolume,
   voiceoverFound,
@@ -116,7 +118,9 @@ export const FullVideo: React.FC<FullVideoProps> = ({
       {voiceoverEnabled && voiceoverFound ? (
         <VoiceoverTrack volume={voiceoverVolume} />
       ) : null}
-      {musicEnabled && musicFound ? <MusicTrack volume={musicVolume} /> : null}
+      {musicEnabled && musicFound ? (
+        <MusicTrack volume={musicVolume} duckedVolume={musicDuckedVolume} />
+      ) : null}
       {sfxEnabled && sfxFound ? <SfxTrack volume={sfxVolume} /> : null}
     </AbsoluteFill>
   );

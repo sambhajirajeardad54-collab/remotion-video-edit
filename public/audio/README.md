@@ -6,7 +6,7 @@ if a file is missing, the video still plays and renders, just without it.
 | File | What it is | Status |
 |---|---|---|
 | `marathi-voiceover.mp3` | Your recorded Marathi narration (converted from your .m4a, loudness -16 LUFS) | Added |
-| `music/background-music.mp3` | Background music (loops, plays quietly under the voice) | Optional, add later |
+| `music/background-music.mp3` | Original cinematic underscore, composed for this project by `scripts/generate-background-music.py` (no third-party music). Ducks under the voice automatically. | Added |
 | `sfx/whoosh.mp3` | Sound effect played at each scene transition | Optional, add later |
 
 Volumes and on/off switches are in Remotion Studio: open FullVideo and use the
