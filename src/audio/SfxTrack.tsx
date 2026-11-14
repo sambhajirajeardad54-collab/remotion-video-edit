@@ -7,19 +7,19 @@ import { AUDIO_FILES } from "./audioFiles";
 export const SfxTrack: React.FC<{ volume: number }> = ({ volume }) => {
   return (
     <Track name="Sound effects">
-      {/* Slide transition: title -> documentary (starts at frame 125). */}
+      {/* Slide transition: title -> documentary (starts at frame 129). */}
       <Audio
         name="Whoosh - slide transition"
         src={staticFile(AUDIO_FILES.whoosh)}
-        from={125}
+        from={129}
         durationInFrames={30}
         volume={volume}
       />
-      {/* Fade transition: documentary -> end card (starts at frame 405). */}
+      {/* Fade transition: documentary -> end card (starts at frame 487). */}
       <Audio
         name="Whoosh - fade transition"
         src={staticFile(AUDIO_FILES.whoosh)}
-        from={405}
+        from={487}
         durationInFrames={30}
         volume={volume}
       />

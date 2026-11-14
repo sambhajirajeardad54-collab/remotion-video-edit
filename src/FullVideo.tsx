@@ -37,7 +37,9 @@ export const fullVideoSchema = z.object({
 
 export type FullVideoProps = z.infer<typeof fullVideoSchema>;
 
-// Total length = 150 + 300 + 105 scene frames - 25 - 20 transition frames = 510.
+// Scene lengths are fitted to the recorded voiceover (see audio/VoiceoverTrack.tsx).
+// Total length = 154 + 378 + 167 scene frames - 25 - 20 transition frames = 654.
+// Scene changes: documentary starts at frame 129, end card at frame 487.
 // If you change a scene or transition length, update durationInFrames of the
 // "FullVideo" composition in Composition.tsx to match.
 
@@ -55,7 +57,7 @@ export const FullVideo: React.FC<FullVideoProps> = ({
   return (
     <AbsoluteFill style={{ backgroundColor: "#0f0c29" }}>
       <TransitionSeries>
-        <TransitionSeries.Sequence name="Opening title" durationInFrames={150}>
+        <TransitionSeries.Sequence name="Opening title" durationInFrames={154}>
           <TitleScene
             title="Remotion Video Edit"
             subtitle="Made with code"
@@ -71,7 +73,7 @@ export const FullVideo: React.FC<FullVideoProps> = ({
           })}
         />
 
-        <TransitionSeries.Sequence name="Documentary" durationInFrames={300}>
+        <TransitionSeries.Sequence name="Documentary" durationInFrames={378}>
           <DocumentaryScene
             chapter="Chapter 02"
             headline="How this video was made"
@@ -99,7 +101,7 @@ export const FullVideo: React.FC<FullVideoProps> = ({
           timing={linearTiming({ durationInFrames: 20 })}
         />
 
-        <TransitionSeries.Sequence name="End card" durationInFrames={105}>
+        <TransitionSeries.Sequence name="End card" durationInFrames={167}>
           <TitleScene
             title="Thanks for watching"
             subtitle="Remotion Video Edit"

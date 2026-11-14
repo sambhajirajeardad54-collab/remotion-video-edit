@@ -37,7 +37,7 @@ export const MyComposition = () => {
         component={FullVideo}
         schema={fullVideoSchema}
         calculateMetadata={detectFullVideoAudio}
-        durationInFrames={510}
+        durationInFrames={654}
         fps={VIDEO_FPS}
         width={VIDEO_WIDTH}
         height={VIDEO_HEIGHT}
