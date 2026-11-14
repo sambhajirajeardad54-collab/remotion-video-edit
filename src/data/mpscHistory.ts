@@ -3,7 +3,9 @@ import type { Caption } from "../components/Subtitles";
 // MPSC गट-क · इतिहास विभाग (source: public/videos/mpsc-history/source.mp4)
 //
 // DRAFT TRANSCRIPT, to be checked by Sam before the final render.
-// Made from Whisper large-v3 (machine transcription, Marathi), then rewritten
+// Made from Whisper large-v3 (machine transcription, Marathi), cross-checked
+// against a Marathi fine-tune (durgesh10/whisper-large-v3-marathi; raw output
+// of both in docs/), then rewritten
 // into standard Marathi spelling from the machine output. It has NOT been
 // checked against the recording by a person yet: every line must be checked. `check` notes mark
 // words the machine heard unclearly.
@@ -35,7 +37,7 @@ export const MPSC_HISTORY_TRANSCRIPT: TranscriptLine[] = [
   {
     startSec: 18.1,
     endSec: 24.4,
-    text: "यामध्ये दिलेलं काय, ते म्हणजे समाजसुधारक, यामध्ये ब्रिटिशकालीन भारत, महाराष्ट्रातील चळवळी, हे सगळं यामध्ये कव्हर केलेलं आहे.",
+    text: "यामध्ये दिलेलं काय, ते म्हणजे समाजसुधारक, यामध्ये ब्रिटिशकालीन भारत, महाराष्ट्रातील चळवळी, हे सगळं यामध्ये कव्हर केलेलं.",
     check: '"कव्हर केलेलं" (machine heard "कावल केराले")',
   },
   {
@@ -53,7 +55,7 @@ export const MPSC_HISTORY_TRANSCRIPT: TranscriptLine[] = [
   {
     startSec: 35.6,
     endSec: 41.4,
-    text: "तर मित्रांनो, ही इन्फॉर्मेशन तुम्हाला कशी वाटली? ही इन्फॉर्मेशन तुम्हाला फायदेशीर ठरत असेल, तर Sam Xplains चॅनलला फॉलो करायला विसरू नका.",
+    text: "तर मित्रांनो, ही इन्फॉर्मेशन तुम्हाला कशी वाटते? ही इन्फॉर्मेशन तुम्हाला फायदेशीर ठरत असेल, तर Sam Xplains चॅनलला फॉलो करायला विसरू नका.",
   },
 ];
 
@@ -93,5 +95,5 @@ export const MPSC_HISTORY_CAPTIONS: Caption[] = [
   { text: "*समाजसुधारक*,", startMs: 19550, endMs: 20450 },
   { text: "यामध्ये *ब्रिटिशकालीन भारत*,", startMs: 20450, endMs: 22050 },
   { text: "*महाराष्ट्रातील चळवळी*,", startMs: 22050, endMs: 23150 },
-  { text: "हे सगळं यामध्ये *कव्हर केलेलं* आहे.", startMs: 23150, endMs: 24400 },
+  { text: "हे सगळं यामध्ये *कव्हर केलेलं*.", startMs: 23150, endMs: 24400 },
 ];
