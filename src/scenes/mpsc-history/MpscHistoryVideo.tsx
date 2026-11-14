@@ -15,6 +15,7 @@ import { KineticHeadline } from "../../components/KineticHeadline";
 import { NumberCounter } from "../../components/NumberCounter";
 import { PhoneMockup } from "../../components/PhoneMockup";
 import { PresenterScene } from "../../components/PresenterScene";
+import { SceneBackground } from "../../components/SceneBackground";
 import { Subtitles } from "../../components/Subtitles";
 import { theme } from "../../components/theme";
 import { DipToBlack, WhipFlash } from "../../components/Transitions";
@@ -29,7 +30,7 @@ import {
 // at the same frame in both footage and timeline (trimBeforeFrames = cut
 // frame), with overlay transitions on top, so sync can never drift.
 //
-// PREVIEW: frames 0-732 (0-24.4 s). Timings come from the word timestamps.
+// Full length: 1290 frames (43 s). Timings come from the word timestamps.
 const SOURCE = "videos/mpsc-history/source.mp4";
 const SOURCE_ASPECT = 1920 / 864; // source footage is 864 x 1920
 const FACE_Y = 0.36; // face centre, as a fraction of source height
@@ -291,8 +292,146 @@ export const MpscHistoryVideo: React.FC = () => {
         </PresenterScene>
       </Sequence>
 
+      {/* F · 24.4-29.8 s · "तर हे बुकसाठी… Sam Xplains चॅनलला फॉलो केलं पाहिजे,
+          तरच PDF… DM…" (same cutout framing as E, so no visible cut) */}
+      <Sequence name="F · Follow for PDF" from={732} durationInFrames={162}>
+        <PresenterScene
+          presenterSrc={SOURCE}
+          withAudio={false}
+          layout="full"
+          name=""
+          role=""
+          accentColor={Y}
+          lowerThirdExitFrame={0}
+          trimBeforeFrames={732}
+          sourceAspect={SOURCE_ASPECT}
+          faceY={FACE_Y}
+          foregroundSrc={CUTOUT}
+          shiftY={150}
+          baseZoom={1.03}
+          zoom={0.04}
+          zoomDurationInFrames={162}
+        >
+          <TopOverlay>
+            <Sequence from={42} durationInFrames={48} layout="none">
+              <CommentCTA
+                variant="follow"
+                label="आधी हे करा"
+                text="Sam Xplains"
+                accentColor={Y}
+                delay={0}
+                exitFrame={44}
+              />
+            </Sequence>
+            <Sequence from={90} durationInFrames={72} layout="none">
+              <CommentCTA
+                variant="dm"
+                label="तरच"
+                text="PDF → तुमच्या DM मध्ये"
+                accentColor={Y}
+                delay={0}
+                exitFrame={62}
+              />
+            </Sequence>
+          </TopOverlay>
+        </PresenterScene>
+      </Sequence>
+
+      {/* G · 29.8-35.5 s · "हिस्ट्री हा खूप हाय स्कोरिंग सब्जेक्ट… एक बुक
+          रेफर केलं…" Real camera shot with a slow documentary push-in. */}
+      <Sequence name="G · High scoring" from={894} durationInFrames={171}>
+        <PresenterScene
+          presenterSrc={SOURCE}
+          withAudio={false}
+          layout="full"
+          name=""
+          role=""
+          accentColor={Y}
+          lowerThirdExitFrame={0}
+          trimBeforeFrames={894}
+          sourceAspect={SOURCE_ASPECT}
+          faceY={FACE_Y}
+          baseZoom={1.08}
+          zoom={0.2}
+          zoomDurationInFrames={171}
+        >
+          <TopOverlay>
+            <Sequence from={18} durationInFrames={75} layout="none">
+              <KineticHeadline
+                kicker="MPSC · इतिहास"
+                text="*हिस्ट्री* = हाय स्कोरिंग विषय"
+                icon="target"
+                fontSize={86}
+                align="left"
+                accentColor={Y}
+                delay={0}
+                exitFrame={66}
+              />
+            </Sequence>
+            <Sequence from={96} durationInFrames={75} layout="none">
+              <KineticHeadline
+                kicker=""
+                text="*एक पुस्तक* → हाय स्कोर"
+                icon="book"
+                fontSize={96}
+                align="left"
+                accentColor={Y}
+                delay={0}
+                exitFrame={0}
+              />
+            </Sequence>
+          </TopOverlay>
+        </PresenterScene>
+      </Sequence>
+
+      {/* H · 35.5-41.5 s · Outro: "…कशी वाटते?… Sam Xplains चॅनलला फॉलो
+          करायला विसरू नका." */}
+      <Sequence name="H · Outro" from={1065} durationInFrames={180}>
+        <PresenterScene
+          presenterSrc={SOURCE}
+          withAudio={false}
+          layout="full"
+          name="Sam Xplains"
+          role="MPSC · इतिहास मार्गदर्शन"
+          accentColor={Y}
+          lowerThirdExitFrame={95}
+          trimBeforeFrames={1065}
+          sourceAspect={SOURCE_ASPECT}
+          faceY={FACE_Y}
+          foregroundSrc={CUTOUT}
+          shiftY={150}
+          baseZoom={1.03}
+          zoom={0.05}
+          zoomDurationInFrames={180}
+        >
+          <TopOverlay>
+            <Sequence from={128} durationInFrames={52} layout="none">
+              <CommentCTA
+                variant="follow"
+                label="विसरू नका!"
+                text="Sam Xplains"
+                accentColor={Y}
+                delay={0}
+                exitFrame={0}
+              />
+            </Sequence>
+          </TopOverlay>
+        </PresenterScene>
+      </Sequence>
+
+      {/* I · 41.5-43.0 s · End card (no speech) */}
+      <Sequence name="I · End card" from={1245} durationInFrames={45}>
+        <EndCard />
+      </Sequence>
+
       {/* Transitions over the cuts (do not change timing). */}
       <Sequence name="Whip · D→E" from={535} durationInFrames={16}>
+        <WhipFlash />
+      </Sequence>
+      <Sequence name="Whip · F→G" from={886} durationInFrames={16}>
+        <WhipFlash />
+      </Sequence>
+      <Sequence name="Whip · G→H" from={1057} durationInFrames={16}>
         <WhipFlash />
       </Sequence>
       <Sequence name="Whip · A→B" from={136} durationInFrames={16}>
@@ -342,6 +481,46 @@ const TopOverlay: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   </AbsoluteFill>
 );
 
+const EndCard: React.FC = () => {
+  const frame = useCurrentFrame();
+  const fadeIn = interpolate(frame, [0, 10], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  return (
+    <AbsoluteFill style={{ opacity: fadeIn }}>
+      <SceneBackground spotlightY={42} />
+      <AbsoluteFill
+        style={{
+          justifyContent: "center",
+          alignItems: "center",
+          gap: 50,
+          paddingBottom: 200,
+        }}
+      >
+        <KineticHeadline
+          kicker="MPSC · इतिहास"
+          text="*Sam Xplains*"
+          icon="none"
+          fontSize={130}
+          align="center"
+          accentColor={Y}
+          delay={2}
+          exitFrame={0}
+        />
+        <CommentCTA
+          variant="follow"
+          label=""
+          text="फॉलो करा"
+          accentColor={Y}
+          delay={10}
+          exitFrame={0}
+        />
+      </AbsoluteFill>
+    </AbsoluteFill>
+  );
+};
+
 const MpscAudio: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps, durationInFrames } = useVideoConfig();
@@ -386,6 +565,20 @@ const MpscAudio: React.FC = () => {
           name="Whoosh D→E"
           src={staticFile("audio/sfx/whoosh.mp3")}
           from={529}
+          durationInFrames={30}
+          volume={0.3}
+        />
+        <Audio
+          name="Whoosh F→G"
+          src={staticFile("audio/sfx/whoosh.mp3")}
+          from={880}
+          durationInFrames={30}
+          volume={0.3}
+        />
+        <Audio
+          name="Whoosh G→H"
+          src={staticFile("audio/sfx/whoosh.mp3")}
+          from={1051}
           durationInFrames={30}
           volume={0.3}
         />
@@ -460,6 +653,62 @@ const MpscAudio: React.FC = () => {
           from={666}
           durationInFrames={8}
           volume={0.2}
+        />
+        <Audio
+          name="Tick - follow"
+          src={staticFile("audio/sfx/tick.mp3")}
+          from={774}
+          durationInFrames={8}
+          volume={0.2}
+        />
+        <Audio
+          name="Tick - DM PDF"
+          src={staticFile("audio/sfx/tick.mp3")}
+          from={822}
+          durationInFrames={8}
+          volume={0.2}
+        />
+        <Audio
+          name="Tick - high scoring"
+          src={staticFile("audio/sfx/tick.mp3")}
+          from={912}
+          durationInFrames={8}
+          volume={0.2}
+        />
+        <Audio
+          name="Tick - one book"
+          src={staticFile("audio/sfx/tick.mp3")}
+          from={990}
+          durationInFrames={8}
+          volume={0.2}
+        />
+        <Audio
+          name="Tick - follow outro"
+          src={staticFile("audio/sfx/tick.mp3")}
+          from={1193}
+          durationInFrames={8}
+          volume={0.2}
+        />
+        <Audio
+          name="Tick - follow pressed"
+          src={staticFile("audio/sfx/tick.mp3")}
+          from={796}
+          durationInFrames={8}
+          volume={0.25}
+        />
+        <Audio
+          name="Tick - follow pressed outro"
+          src={staticFile("audio/sfx/tick.mp3")}
+          from={1215}
+          durationInFrames={8}
+          volume={0.25}
+        />
+        <Audio
+          name="Impact - end card"
+          src={staticFile("audio/sfx/impact-soft.mp3")}
+          from={1247}
+          durationInFrames={43}
+          volume={0.22}
         />
       </Track>
     </>

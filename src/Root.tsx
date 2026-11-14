@@ -106,12 +106,12 @@ export const RemotionRoot: React.FC = () => {
         height={VIDEO_HEIGHT}
       />
 
-      {/* MPSC गट-क · इतिहास: documentary edit of Sam's video (preview: first 18 s). */}
+      {/* MPSC गट-क · इतिहास: documentary edit of Sam's video (43 s). */}
       <Folder name="MPSC-History">
         <Composition
-          id="MpscHistoryPreview"
+          id="MpscHistory"
           component={MpscHistoryVideo}
-          durationInFrames={732}
+          durationInFrames={1290}
           fps={VIDEO_FPS}
           width={VIDEO_WIDTH}
           height={VIDEO_HEIGHT}
