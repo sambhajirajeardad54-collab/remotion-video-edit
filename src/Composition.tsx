@@ -1,10 +1,27 @@
-import { Composition, Folder } from "remotion";
+import { CalculateMetadataFunction, Composition, Folder } from "remotion";
+import { detectAudioFiles } from "./audio/audioFiles";
 import { TitleScene, titleSceneSchema } from "./TitleScene";
 import {
   DocumentaryScene,
   documentarySceneSchema,
 } from "./DocumentaryScene";
-import { FullVideo } from "./FullVideo";
+import { FullVideo, FullVideoProps, fullVideoSchema } from "./FullVideo";
+
+// Before the video plays or renders, check which audio files exist in
+// public/audio/. Missing files are skipped, so the video never breaks.
+const detectFullVideoAudio: CalculateMetadataFunction<FullVideoProps> = async ({
+  props,
+}) => {
+  const found = await detectAudioFiles();
+  return {
+    props: {
+      ...props,
+      voiceoverFound: found.voiceover,
+      musicFound: found.music,
+      sfxFound: found.whoosh,
+    },
+  };
+};
 
 // Vertical 9:16 video (Reels / Shorts / TikTok).
 export const VIDEO_WIDTH = 1080;
@@ -18,10 +35,23 @@ export const MyComposition = () => {
       <Composition
         id="FullVideo"
         component={FullVideo}
+        schema={fullVideoSchema}
+        calculateMetadata={detectFullVideoAudio}
         durationInFrames={510}
         fps={VIDEO_FPS}
         width={VIDEO_WIDTH}
         height={VIDEO_HEIGHT}
+        defaultProps={{
+          voiceoverEnabled: true,
+          voiceoverVolume: 1,
+          musicEnabled: true,
+          musicVolume: 0.12,
+          sfxEnabled: true,
+          sfxVolume: 0.5,
+          voiceoverFound: false,
+          musicFound: false,
+          sfxFound: false,
+        }}
       />
 
       {/* Individual scenes, for previewing and editing on their own. */}

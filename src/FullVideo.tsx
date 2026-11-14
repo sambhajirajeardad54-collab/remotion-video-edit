@@ -13,14 +13,45 @@ import {
   useCurrentFrame,
   useVideoConfig,
 } from "remotion";
+import { z } from "zod";
 import { DocumentaryScene } from "./DocumentaryScene";
 import { TitleScene } from "./TitleScene";
+import { MusicTrack } from "./audio/MusicTrack";
+import { SfxTrack } from "./audio/SfxTrack";
+import { VoiceoverTrack } from "./audio/VoiceoverTrack";
+
+// Audio settings, editable in the Studio "Props" panel.
+// The "...Found" values are filled in automatically (see Composition.tsx):
+// a track only plays if its file exists in public/audio/.
+export const fullVideoSchema = z.object({
+  voiceoverEnabled: z.boolean(),
+  voiceoverVolume: z.number().min(0).max(2),
+  musicEnabled: z.boolean(),
+  musicVolume: z.number().min(0).max(1),
+  sfxEnabled: z.boolean(),
+  sfxVolume: z.number().min(0).max(1),
+  voiceoverFound: z.boolean(),
+  musicFound: z.boolean(),
+  sfxFound: z.boolean(),
+});
+
+export type FullVideoProps = z.infer<typeof fullVideoSchema>;
 
 // Total length = 150 + 300 + 105 scene frames - 25 - 20 transition frames = 510.
 // If you change a scene or transition length, update durationInFrames of the
 // "FullVideo" composition in Composition.tsx to match.
 
-export const FullVideo: React.FC = () => {
+export const FullVideo: React.FC<FullVideoProps> = ({
+  voiceoverEnabled,
+  voiceoverVolume,
+  musicEnabled,
+  musicVolume,
+  sfxEnabled,
+  sfxVolume,
+  voiceoverFound,
+  musicFound,
+  sfxFound,
+}) => {
   return (
     <AbsoluteFill style={{ backgroundColor: "#0f0c29" }}>
       <TransitionSeries>
@@ -78,6 +109,13 @@ export const FullVideo: React.FC = () => {
       </TransitionSeries>
 
       <MotionOverlay />
+
+      {/* Three separate audio layers. Each is skipped if its file is missing. */}
+      {voiceoverEnabled && voiceoverFound ? (
+        <VoiceoverTrack volume={voiceoverVolume} />
+      ) : null}
+      {musicEnabled && musicFound ? <MusicTrack volume={musicVolume} /> : null}
+      {sfxEnabled && sfxFound ? <SfxTrack volume={sfxVolume} /> : null}
     </AbsoluteFill>
   );
 };
