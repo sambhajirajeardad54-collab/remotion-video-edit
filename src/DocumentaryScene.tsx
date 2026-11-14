@@ -12,11 +12,8 @@ import {
 export const documentarySceneSchema = z.object({
   chapter: z.string(),
   headline: z.string(),
-  statValue: z.number().min(0).max(100),
-  statLabel: z.string(),
-  chartTitle: z.string(),
-  bars: z.array(z.object({ label: z.string(), value: z.number() })),
-  source: z.string(),
+  steps: z.array(z.object({ title: z.string(), description: z.string() })),
+  footer: z.string(),
   accentColor: z.string(),
 });
 
@@ -25,11 +22,8 @@ export type DocumentarySceneProps = z.infer<typeof documentarySceneSchema>;
 export const DocumentaryScene: React.FC<DocumentarySceneProps> = ({
   chapter,
   headline,
-  statValue,
-  statLabel,
-  chartTitle,
-  bars,
-  source,
+  steps,
+  footer,
   accentColor,
 }) => {
   const frame = useCurrentFrame();
@@ -52,7 +46,7 @@ export const DocumentaryScene: React.FC<DocumentarySceneProps> = ({
         style={{
           position: "absolute",
           inset: 0,
-          padding: "180px 90px",
+          padding: "200px 90px 180px",
           display: "flex",
           flexDirection: "column",
           gap: 70,
@@ -79,7 +73,7 @@ export const DocumentaryScene: React.FC<DocumentarySceneProps> = ({
           style={{
             alignSelf: "flex-start",
             padding: "14px 28px",
-            border: "3px solid #38bdf8",
+            border: `3px solid ${accentColor}`,
             borderRadius: 999,
             fontSize: 34,
             fontWeight: 600,
@@ -116,28 +110,24 @@ export const DocumentaryScene: React.FC<DocumentarySceneProps> = ({
           }}
         />
 
-        <StatCard
-          value={statValue}
-          label={statLabel}
-          accentColor={accentColor}
-        />
-
-        <BarChart title={chartTitle} bars={bars} accentColor={accentColor} />
+        <ProcessTimeline steps={steps} accentColor={accentColor} />
 
         <Interactive.Div
-          name="Source"
+          name="Footer"
           style={{
             marginTop: "auto",
-            fontSize: 28,
+            fontSize: 32,
+            fontWeight: 600,
+            letterSpacing: 4,
+            textTransform: "uppercase",
             color: "rgba(255,255,255,0.55)",
-            letterSpacing: 1,
-            opacity: interpolate(frame, [190, 215], [0, 1], {
+            opacity: interpolate(frame, [200, 225], [0, 1], {
               extrapolateLeft: "clamp",
               extrapolateRight: "clamp",
             }),
           }}
         >
-          {source}
+          {footer}
         </Interactive.Div>
       </Interactive.Div>
     </AbsoluteFill>
@@ -171,7 +161,7 @@ const Headline: React.FC<{ text: string }> = ({ text }) => {
     <Interactive.Div
       name="Headline"
       style={{
-        fontSize: 104,
+        fontSize: 112,
         fontWeight: 800,
         lineHeight: 1.08,
         display: "flex",
@@ -206,165 +196,114 @@ const Headline: React.FC<{ text: string }> = ({ text }) => {
   );
 };
 
-// Animated percentage ring with a counting number.
-const StatCard: React.FC<{
-  value: number;
-  label: string;
+// Vertical process diagram: numbered nodes joined by a line that draws in,
+// with each step's text sliding in beside its node.
+const ProcessTimeline: React.FC<{
+  steps: { title: string; description: string }[];
   accentColor: string;
-}> = ({ value, label, accentColor }) => {
+}> = ({ steps, accentColor }) => {
   const frame = useCurrentFrame();
-  const progress = interpolate(frame, [60, 120], [0, 1], {
-    easing: Easing.bezier(0.33, 1, 0.68, 1),
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
-  const radius = 120;
-  const circumference = 2 * Math.PI * radius;
+  const NODE = 96;
+  const STEP_GAP = 70;
+  const FIRST_STEP = 75;
+  const STAGGER = 35;
 
   return (
     <Interactive.Div
-      name="Stat card"
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 56,
-        padding: 48,
-        borderRadius: 36,
-        backgroundColor: "rgba(255,255,255,0.06)",
-        border: "2px solid rgba(255,255,255,0.12)",
-        opacity: interpolate(frame, [55, 75], [0, 1], {
-          extrapolateLeft: "clamp",
-          extrapolateRight: "clamp",
-        }),
-        translate: interpolate(frame, [55, 80], ["0px 60px", "0px 0px"], {
-          easing: Easing.bezier(0.16, 1, 0.3, 1),
-          extrapolateLeft: "clamp",
-          extrapolateRight: "clamp",
-        }),
-      }}
-    >
-      <div style={{ position: "relative", width: 280, height: 280 }}>
-        <svg width={280} height={280} style={{ rotate: "-90deg" }}>
-          <circle
-            cx={140}
-            cy={140}
-            r={radius}
-            fill="none"
-            stroke="rgba(255,255,255,0.12)"
-            strokeWidth={22}
-          />
-          <circle
-            cx={140}
-            cy={140}
-            r={radius}
-            fill="none"
-            stroke={accentColor}
-            strokeWidth={22}
-            strokeLinecap="round"
-            strokeDasharray={circumference}
-            strokeDashoffset={circumference * (1 - (value / 100) * progress)}
-          />
-        </svg>
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            fontSize: 84,
-            fontWeight: 800,
-          }}
-        >
-          {Math.round(value * progress)}%
-        </div>
-      </div>
-      <div
-        style={{
-          flex: 1,
-          fontSize: 44,
-          lineHeight: 1.25,
-          color: "rgba(255,255,255,0.85)",
-        }}
-      >
-        {label}
-      </div>
-    </Interactive.Div>
-  );
-};
-
-// Horizontal bars that grow in one after another.
-const BarChart: React.FC<{
-  title: string;
-  bars: { label: string; value: number }[];
-  accentColor: string;
-}> = ({ title, bars, accentColor }) => {
-  const frame = useCurrentFrame();
-  const max = Math.max(1, ...bars.map((b) => b.value));
-
-  return (
-    <Interactive.Div
-      name="Bar chart"
+      name="Process timeline"
       style={{
         display: "flex",
         flexDirection: "column",
-        gap: 34,
-        opacity: interpolate(frame, [110, 130], [0, 1], {
-          extrapolateLeft: "clamp",
-          extrapolateRight: "clamp",
-        }),
+        gap: STEP_GAP,
       }}
     >
-      <div
-        style={{
-          fontSize: 34,
-          fontWeight: 600,
-          letterSpacing: 4,
-          textTransform: "uppercase",
-          color: "rgba(255,255,255,0.6)",
-        }}
-      >
-        {title}
-      </div>
-      {bars.map((bar, i) => {
-        const start = 120 + i * 12;
-        const grow = interpolate(frame, [start, start + 30], [0, 1], {
+      {steps.map((step, i) => {
+        const start = FIRST_STEP + i * STAGGER;
+        const nodeIn = interpolate(frame, [start, start + 15], [0, 1], {
+          easing: Easing.bezier(0.34, 1.56, 0.64, 1),
+          extrapolateLeft: "clamp",
+          extrapolateRight: "clamp",
+        });
+        const textIn = interpolate(frame, [start + 5, start + 25], [0, 1], {
           easing: Easing.bezier(0.16, 1, 0.3, 1),
           extrapolateLeft: "clamp",
           extrapolateRight: "clamp",
         });
+        // Connector to the next node draws while waiting for the next step.
+        const lineIn = interpolate(
+          frame,
+          [start + 12, start + STAGGER],
+          [0, 1],
+          { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
+        );
+        const isLast = i === steps.length - 1;
+
         return (
-          <div key={`${bar.label}-${i}`}>
+          <div
+            key={`${step.title}-${i}`}
+            style={{ display: "flex", gap: 44, position: "relative" }}
+          >
+            {!isLast && (
+              <div
+                style={{
+                  position: "absolute",
+                  left: NODE / 2 - 2,
+                  top: NODE,
+                  width: 4,
+                  height: `calc(100% - ${NODE}px + ${STEP_GAP}px)`,
+                  backgroundColor: "rgba(255,255,255,0.15)",
+                  opacity: nodeIn,
+                }}
+              >
+                <div
+                  style={{
+                    width: "100%",
+                    height: `${lineIn * 100}%`,
+                    backgroundColor: accentColor,
+                  }}
+                />
+              </div>
+            )}
             <div
               style={{
+                flexShrink: 0,
+                width: NODE,
+                height: NODE,
+                borderRadius: NODE / 2,
+                border: `4px solid ${accentColor}`,
+                backgroundColor: "#1b1740",
                 display: "flex",
-                justifyContent: "space-between",
+                justifyContent: "center",
+                alignItems: "center",
                 fontSize: 38,
-                marginBottom: 12,
+                fontWeight: 800,
+                color: accentColor,
+                scale: `${nodeIn}`,
+                boxShadow: `0 0 ${40 * nodeIn}px ${accentColor}55`,
               }}
             >
-              <span>{bar.label}</span>
-              <span style={{ fontWeight: 700, color: accentColor }}>
-                {Math.round(bar.value * grow)}
-              </span>
+              {String(i + 1).padStart(2, "0")}
             </div>
             <div
               style={{
-                height: 26,
-                borderRadius: 13,
-                backgroundColor: "rgba(255,255,255,0.1)",
-                overflow: "hidden",
+                display: "flex",
+                flexDirection: "column",
+                gap: 12,
+                paddingTop: 6,
+                opacity: textIn,
+                translate: `${(1 - textIn) * 60}px 0px`,
               }}
             >
+              <div style={{ fontSize: 64, fontWeight: 800 }}>{step.title}</div>
               <div
                 style={{
-                  height: "100%",
-                  width: `${(bar.value / max) * 100 * grow}%`,
-                  borderRadius: 13,
-                  backgroundColor: accentColor,
-                  opacity: 1 - i * 0.2,
+                  fontSize: 40,
+                  lineHeight: 1.3,
+                  color: "rgba(255,255,255,0.75)",
                 }}
-              />
+              >
+                {step.description}
+              </div>
             </div>
           </div>
         );
