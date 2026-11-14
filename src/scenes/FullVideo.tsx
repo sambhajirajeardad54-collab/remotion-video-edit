@@ -16,9 +16,9 @@ import {
 import { z } from "zod";
 import { DocumentaryScene } from "./DocumentaryScene";
 import { TitleScene } from "./TitleScene";
-import { MusicTrack } from "./audio/MusicTrack";
-import { SfxTrack } from "./audio/SfxTrack";
-import { VoiceoverTrack } from "./audio/VoiceoverTrack";
+import { MusicTrack } from "../audio/MusicTrack";
+import { SfxTrack } from "../audio/SfxTrack";
+import { VoiceoverTrack } from "../audio/VoiceoverTrack";
 
 // Audio settings, editable in the Studio "Props" panel.
 // The "...Found" values are filled in automatically (see Composition.tsx):
