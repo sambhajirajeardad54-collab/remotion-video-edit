@@ -18,7 +18,7 @@ const detectFullVideoAudio: CalculateMetadataFunction<FullVideoProps> = async ({
       ...props,
       voiceoverFound: found.voiceover,
       musicFound: found.music,
-      sfxFound: found.whoosh,
+      sfxFound: found.sfx,
     },
   };
 };

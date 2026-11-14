@@ -6,10 +6,23 @@ import { staticFile } from "remotion";
 export const AUDIO_FILES = {
   voiceover: "audio/marathi-voiceover.mp3",
   music: "audio/music/background-music.mp3",
-  whoosh: "audio/sfx/whoosh.mp3",
 } as const;
 
-export type AudioAvailability = Record<keyof typeof AUDIO_FILES, boolean>;
+// Original sound effects (see scripts/generate-sound-effects.py).
+export const SFX_FILES = {
+  whoosh: "audio/sfx/whoosh.mp3",
+  impact: "audio/sfx/impact-soft.mp3",
+  tick: "audio/sfx/tick.mp3",
+  swipe: "audio/sfx/swipe.mp3",
+  riser: "audio/sfx/riser.mp3",
+} as const;
+
+export type AudioAvailability = {
+  voiceover: boolean;
+  music: boolean;
+  // True only when every sound effect file is present.
+  sfx: boolean;
+};
 
 // Checks whether a file exists in public/ before the video uses it.
 // Works the same in Remotion Studio and while rendering.
@@ -25,10 +38,10 @@ const fileExists = async (path: string): Promise<boolean> => {
 };
 
 export const detectAudioFiles = async (): Promise<AudioAvailability> => {
-  const [voiceover, music, whoosh] = await Promise.all([
+  const [voiceover, music, ...sfx] = await Promise.all([
     fileExists(AUDIO_FILES.voiceover),
     fileExists(AUDIO_FILES.music),
-    fileExists(AUDIO_FILES.whoosh),
+    ...Object.values(SFX_FILES).map(fileExists),
   ]);
-  return { voiceover, music, whoosh };
+  return { voiceover, music, sfx: sfx.every(Boolean) };
 };
