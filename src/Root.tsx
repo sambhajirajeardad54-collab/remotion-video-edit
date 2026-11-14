@@ -111,7 +111,7 @@ export const RemotionRoot: React.FC = () => {
         <Composition
           id="MpscHistoryPreview"
           component={MpscHistoryVideo}
-          durationInFrames={540}
+          durationInFrames={732}
           fps={VIDEO_FPS}
           width={VIDEO_WIDTH}
           height={VIDEO_HEIGHT}

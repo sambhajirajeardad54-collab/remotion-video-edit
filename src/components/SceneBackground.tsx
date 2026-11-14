@@ -1,13 +1,25 @@
 import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
 import { theme } from "./theme";
 
-// The standard Sam Xplains backdrop: brand gradient + slowly drifting grid.
-export const SceneBackground: React.FC<{ showGrid?: boolean }> = ({
-  showGrid = true,
-}) => {
+// The standard Sam Xplains backdrop: dark navy gradient + slowly drifting
+// grid. With `spotlightY` (in % of the height) a soft light glows behind a
+// presenter cutout, like a studio backlight.
+export const SceneBackground: React.FC<{
+  showGrid?: boolean;
+  spotlightY?: number;
+}> = ({ showGrid = true, spotlightY }) => {
   const frame = useCurrentFrame();
+  const pulse = 1 + 0.04 * Math.sin(frame / 40);
   return (
     <AbsoluteFill style={{ background: theme.background }}>
+      {spotlightY !== undefined ? (
+        <AbsoluteFill
+          style={{
+            background: `radial-gradient(circle at 50% ${spotlightY}%, rgba(250,204,21,0.16) 0%, rgba(56,110,200,0.14) 28%, transparent 60%)`,
+            scale: `${pulse}`,
+          }}
+        />
+      ) : null}
       {showGrid ? (
         <AbsoluteFill
           style={{

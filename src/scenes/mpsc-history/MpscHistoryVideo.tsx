@@ -29,10 +29,12 @@ import {
 // at the same frame in both footage and timeline (trimBeforeFrames = cut
 // frame), with overlay transitions on top, so sync can never drift.
 //
-// PREVIEW: frames 0-540 (0-18 s). Timings come from the word timestamps.
+// PREVIEW: frames 0-732 (0-24.4 s). Timings come from the word timestamps.
 const SOURCE = "videos/mpsc-history/source.mp4";
 const SOURCE_ASPECT = 1920 / 864; // source footage is 864 x 1920
 const FACE_Y = 0.36; // face centre, as a fraction of source height
+// Presenter with the background removed (transparent WebM, same timing).
+const CUTOUT = "videos/mpsc-history/presenter-cutout.webm";
 const Y = theme.accent; // yellow
 
 export const MpscHistoryVideo: React.FC = () => {
@@ -208,6 +210,7 @@ export const MpscHistoryVideo: React.FC = () => {
           trimBeforeFrames={468}
           sourceAspect={SOURCE_ASPECT}
           faceY={FACE_Y}
+          foregroundSrc={CUTOUT}
           baseZoom={1.22}
           zoom={0.05}
           zoomDurationInFrames={72}
@@ -225,7 +228,73 @@ export const MpscHistoryVideo: React.FC = () => {
         </PresenterScene>
       </Sequence>
 
+      {/* E · 18.1-24.4 s · "यामध्ये दिलेलं काय… समाजसुधारक, ब्रिटिशकालीन भारत,
+          महाराष्ट्रातील चळवळी… हे सगळं यामध्ये कव्हर केलेलं आहे" */}
+      <Sequence
+        name="E · What the book covers"
+        from={543}
+        durationInFrames={189}
+      >
+        <PresenterScene
+          presenterSrc={SOURCE}
+          withAudio={false}
+          layout="full"
+          name=""
+          role=""
+          accentColor={Y}
+          lowerThirdExitFrame={0}
+          trimBeforeFrames={543}
+          sourceAspect={SOURCE_ASPECT}
+          faceY={FACE_Y}
+          foregroundSrc={CUTOUT}
+          anchorBottom
+          baseZoom={0.8}
+          zoom={0.03}
+          zoomDurationInFrames={189}
+        >
+          <TopOverlay>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 34,
+                width: 940,
+              }}
+            >
+              <KineticHeadline
+                kicker="या पुस्तकात"
+                text="काय *कव्हर* केलं आहे?"
+                icon="book"
+                fontSize={78}
+                align="left"
+                accentColor={Y}
+                delay={0}
+                exitFrame={0}
+              />
+              <Infographic
+                variant="list"
+                title=""
+                items={[
+                  { title: "समाजसुधारक", description: "" },
+                  { title: "ब्रिटिशकालीन भारत", description: "" },
+                  { title: "महाराष्ट्रातील चळवळी", description: "" },
+                ]}
+                columns={[]}
+                accentColor={Y}
+                listIcon="check"
+                delay={25}
+                stagger={39}
+                exitFrame={0}
+              />
+            </div>
+          </TopOverlay>
+        </PresenterScene>
+      </Sequence>
+
       {/* Transitions over the cuts (do not change timing). */}
+      <Sequence name="Whip · D→E" from={535} durationInFrames={16}>
+        <WhipFlash />
+      </Sequence>
       <Sequence name="Whip · A→B" from={136} durationInFrames={16}>
         <WhipFlash />
       </Sequence>
@@ -313,6 +382,13 @@ const MpscAudio: React.FC = () => {
           durationInFrames={30}
           volume={0.3}
         />
+        <Audio
+          name="Whoosh D→E"
+          src={staticFile("audio/sfx/whoosh.mp3")}
+          from={529}
+          durationInFrames={30}
+          volume={0.3}
+        />
       </Track>
       <Track name="SFX - Accents">
         <Audio
@@ -361,6 +437,27 @@ const MpscAudio: React.FC = () => {
           name="Tick - DM"
           src={staticFile("audio/sfx/tick.mp3")}
           from={492}
+          durationInFrames={8}
+          volume={0.2}
+        />
+        <Audio
+          name="Tick - topic 1"
+          src={staticFile("audio/sfx/tick.mp3")}
+          from={588}
+          durationInFrames={8}
+          volume={0.2}
+        />
+        <Audio
+          name="Tick - topic 2"
+          src={staticFile("audio/sfx/tick.mp3")}
+          from={627}
+          durationInFrames={8}
+          volume={0.2}
+        />
+        <Audio
+          name="Tick - topic 3"
+          src={staticFile("audio/sfx/tick.mp3")}
+          from={666}
           durationInFrames={8}
           volume={0.2}
         />

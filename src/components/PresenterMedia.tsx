@@ -5,6 +5,7 @@ import {
   useCurrentFrame,
   useVideoConfig,
 } from "remotion";
+import { SceneBackground } from "./SceneBackground";
 import { theme } from "./theme";
 
 // Shows your talking-head footage, or a placeholder until you have it.
@@ -34,6 +35,13 @@ export const PresenterMedia: React.FC<{
   sourceAspect?: number;
   containerHeight?: number;
   faceY?: number;
+  // Background removal: a transparent WebM of the presenter (same size and
+  // timing as presenterSrc). When set, the original background is replaced
+  // by the dark Sam Xplains backdrop with a soft spotlight.
+  foregroundSrc?: string;
+  // Zoom around the bottom edge instead of the face (to make the presenter
+  // smaller and lower, leaving room for graphics above).
+  anchorBottom?: boolean;
 }> = ({
   presenterSrc,
   withAudio,
@@ -47,6 +55,8 @@ export const PresenterMedia: React.FC<{
   sourceAspect,
   containerHeight,
   faceY = 0.36,
+  foregroundSrc,
+  anchorBottom = false,
 }) => {
   const frame = useCurrentFrame();
   const { width } = useVideoConfig();
@@ -66,9 +76,20 @@ export const PresenterMedia: React.FC<{
     originX = 50;
     originY = ((top + faceY * boxH) / containerHeight) * 100;
   }
+  const spotlightY = originY;
+  if (anchorBottom) {
+    originY = 100;
+  }
 
   return (
     <AbsoluteFill style={{ overflow: "hidden" }}>
+      {foregroundSrc ? (
+        <SceneBackground
+          spotlightY={
+            anchorBottom ? 100 - (100 - spotlightY) * scale : spotlightY
+          }
+        />
+      ) : null}
       <AbsoluteFill
         style={{
           scale: `${scale}`,
@@ -78,8 +99,8 @@ export const PresenterMedia: React.FC<{
         {presenterSrc ? (
           <div style={boxStyle}>
             <Video
-              name="Presenter footage"
-              src={staticFile(presenterSrc)}
+              name={foregroundSrc ? "Presenter cutout" : "Presenter footage"}
+              src={staticFile(foregroundSrc || presenterSrc)}
               trimBefore={trimBeforeFrames > 0 ? trimBeforeFrames : undefined}
               muted={!withAudio}
               objectFit="cover"

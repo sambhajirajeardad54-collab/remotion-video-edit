@@ -89,4 +89,9 @@ export const MPSC_HISTORY_CAPTIONS: Caption[] = [
     startMs: 16000,
     endMs: 17950,
   },
+  { text: "यामध्ये *दिलेलं काय*, ते म्हणजे", startMs: 18080, endMs: 19550 },
+  { text: "*समाजसुधारक*,", startMs: 19550, endMs: 20450 },
+  { text: "यामध्ये *ब्रिटिशकालीन भारत*,", startMs: 20450, endMs: 22050 },
+  { text: "*महाराष्ट्रातील चळवळी*,", startMs: 22050, endMs: 23150 },
+  { text: "हे सगळं यामध्ये *कव्हर केलेलं* आहे.", startMs: 23150, endMs: 24400 },
 ];
