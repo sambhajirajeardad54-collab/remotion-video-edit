@@ -8,6 +8,9 @@ import { theme } from "./theme";
 // shown on screen must say where it comes from.
 export const numberCounterSchema = z.object({
   value: z.number(),
+  // Show a range "rangeFrom ते value" (e.g. 12 ते 13). null = single number.
+  rangeFrom: z.number().nullable(),
+  rangeSeparator: z.string(),
   decimals: z.number().int().min(0).max(3),
   prefix: z.string(), // e.g. "₹"
   suffix: z.string(), // e.g. "%" or " कोटी"
@@ -46,6 +49,8 @@ export const formatIndianNumber = (
 
 export const NumberCounter: React.FC<NumberCounterProps> = ({
   value,
+  rangeFrom,
+  rangeSeparator,
   decimals,
   prefix,
   suffix,
@@ -90,6 +95,9 @@ export const NumberCounter: React.FC<NumberCounterProps> = ({
         }}
       >
         {prefix}
+        {rangeFrom !== null
+          ? `${formatIndianNumber(rangeFrom * count, decimals, digits)}${rangeSeparator}`
+          : null}
         {formatIndianNumber(value * count, decimals, digits)}
         {suffix}
       </div>

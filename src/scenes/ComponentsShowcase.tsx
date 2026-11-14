@@ -87,6 +87,8 @@ export const ComponentsShowcase: React.FC = () => {
           >
             <NumberCounter
               value={125000}
+              rangeFrom={null}
+              rangeSeparator=" ते "
               decimals={0}
               prefix=""
               suffix=""
@@ -120,6 +122,7 @@ export const ComponentsShowcase: React.FC = () => {
                 { title: "नियमित उजळणी", description: "" },
               ]}
               columns={[]}
+              listIcon="check"
               accentColor={theme.accent}
               delay={8}
               stagger={14}
@@ -168,6 +171,7 @@ export const ComponentsShowcase: React.FC = () => {
         fontSize={76}
         maxWidth={960}
         highlightColor={theme.highlight}
+        highlightStyle="box"
       />
     </AbsoluteFill>
   );

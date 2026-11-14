@@ -30,6 +30,8 @@ export const subtitlesSchema = z.object({
   fontSize: z.number().min(30).max(140),
   maxWidth: z.number().min(400).max(1040),
   highlightColor: z.string(),
+  // "box": dark text on a coloured box. "text": coloured text with outline.
+  highlightStyle: z.enum(["box", "text"]),
 });
 
 export type Caption = z.infer<typeof captionSchema>;
@@ -71,6 +73,7 @@ export const Subtitles: React.FC<SubtitlesProps> = ({
   fontSize,
   maxWidth,
   highlightColor,
+  highlightStyle,
 }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
@@ -114,6 +117,7 @@ export const Subtitles: React.FC<SubtitlesProps> = ({
         }}
       >
         {words.map((word, i) => {
+          const boxed = word.highlighted && highlightStyle === "box";
           const wordStart = startFrame + i * perWord;
           const appear = progress(frame, wordStart, 6, EASE_OUT);
           const pop = word.highlighted
@@ -124,19 +128,17 @@ export const Subtitles: React.FC<SubtitlesProps> = ({
               key={`${word.text}-${i}`}
               style={{
                 display: "inline-block",
-                padding: word.highlighted ? `0 ${fontSize * 0.18}px` : 0,
+                padding: boxed ? `0 ${fontSize * 0.18}px` : 0,
                 borderRadius: fontSize * 0.2,
-                backgroundColor: word.highlighted
-                  ? highlightColor
-                  : "transparent",
-                color: word.highlighted ? "#0f0c29" : theme.text,
-                // Dark outline keeps white text readable on any background.
-                textShadow: word.highlighted
-                  ? "none"
-                  : "0 0 4px rgba(0,0,0,0.9), 0 4px 14px rgba(0,0,0,0.75), 2px 2px 0 rgba(0,0,0,0.7), -2px -2px 0 rgba(0,0,0,0.7), 2px -2px 0 rgba(0,0,0,0.7), -2px 2px 0 rgba(0,0,0,0.7)",
-                boxShadow: word.highlighted
-                  ? "0 8px 24px rgba(0,0,0,0.35)"
-                  : "none",
+                backgroundColor: boxed ? highlightColor : "transparent",
+                color: boxed
+                  ? "#04070f"
+                  : word.highlighted
+                    ? highlightColor
+                    : theme.text,
+                // Dark outline keeps text readable on any background.
+                textShadow: boxed ? "none" : theme.textOutline,
+                boxShadow: boxed ? "0 8px 24px rgba(0,0,0,0.35)" : "none",
                 opacity: appear,
                 translate: `0px ${(1 - appear) * fontSize * 0.35}px`,
                 scale: `${0.85 + 0.15 * pop}`,

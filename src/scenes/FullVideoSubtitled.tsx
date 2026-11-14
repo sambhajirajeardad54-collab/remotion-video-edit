@@ -18,6 +18,7 @@ export const FullVideoSubtitled: React.FC<FullVideoProps> = (props) => {
         fontSize={70}
         maxWidth={960}
         highlightColor={theme.highlight}
+        highlightStyle="box"
       />
     </AbsoluteFill>
   );

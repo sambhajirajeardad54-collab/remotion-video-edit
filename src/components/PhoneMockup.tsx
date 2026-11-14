@@ -18,7 +18,10 @@ export const phoneMockupSchema = z.object({
   exitFrame: z.number().int().min(0), // 0 = stays until the end
 });
 
-export type PhoneMockupProps = z.infer<typeof phoneMockupSchema>;
+export type PhoneMockupProps = z.infer<typeof phoneMockupSchema> & {
+  // Start the screen video this many frames in (keeps it in sync).
+  screenTrimBeforeFrames?: number;
+};
 
 const PHONE_W = 540;
 const PHONE_H = 1100;
@@ -31,6 +34,7 @@ export const PhoneMockup: React.FC<PhoneMockupProps> = ({
   accentColor,
   delay,
   exitFrame,
+  screenTrimBeforeFrames = 0,
 }) => {
   const frame = useCurrentFrame();
   const enter = progress(frame, delay, 30);
@@ -99,6 +103,9 @@ export const PhoneMockup: React.FC<PhoneMockupProps> = ({
             <Video
               name="Phone screen video"
               src={staticFile(screenVideoSrc)}
+              trimBefore={
+                screenTrimBeforeFrames > 0 ? screenTrimBeforeFrames : undefined
+              }
               muted
               objectFit="cover"
               style={{ width: "100%", height: "100%" }}

@@ -26,7 +26,17 @@ export const presenterSceneSchema = z.object({
 });
 
 export type PresenterSceneProps = z.infer<typeof presenterSceneSchema> & {
+  // "top-half": shown below the presenter. "full": shown on top of the footage.
   children?: React.ReactNode;
+  // Footage options (see PresenterMedia): start offset and reframing.
+  trimBeforeFrames?: number;
+  baseZoom?: number;
+  zoom?: number;
+  zoomDurationInFrames?: number;
+  focusX?: number;
+  focusY?: number;
+  sourceAspect?: number;
+  faceY?: number;
 };
 
 export const PresenterScene: React.FC<PresenterSceneProps> = ({
@@ -38,9 +48,18 @@ export const PresenterScene: React.FC<PresenterSceneProps> = ({
   accentColor,
   lowerThirdExitFrame,
   children,
+  trimBeforeFrames,
+  baseZoom,
+  zoom,
+  zoomDurationInFrames,
+  focusX,
+  focusY,
+  sourceAspect,
+  faceY,
 }) => {
   const { durationInFrames } = useVideoConfig();
   const isSplit = layout === "top-half";
+  const { height } = useVideoConfig();
 
   return (
     <AbsoluteFill
@@ -56,22 +75,32 @@ export const PresenterScene: React.FC<PresenterSceneProps> = ({
         <PresenterMedia
           presenterSrc={presenterSrc}
           withAudio={withAudio}
-          durationInFrames={durationInFrames}
+          durationInFrames={zoomDurationInFrames ?? durationInFrames}
+          trimBeforeFrames={trimBeforeFrames}
+          baseZoom={baseZoom}
+          zoom={zoom}
+          focusX={focusX}
+          focusY={focusY}
+          sourceAspect={sourceAspect}
+          containerHeight={isSplit ? height * 0.52 : height}
+          faceY={faceY}
         />
         {/* Darken the bottom edge so the name banner stays readable. */}
         <AbsoluteFill
           style={{
             background:
-              "linear-gradient(180deg, transparent 55%, rgba(15,12,41,0.85) 100%)",
+              "linear-gradient(180deg, transparent 55%, rgba(4,7,15,0.85) 100%)",
           }}
         />
-        <LowerThird
-          name={name}
-          role={role}
-          accentColor={accentColor}
-          exitFrame={lowerThirdExitFrame}
-          bottom={isSplit ? 60 : 560}
-        />
+        {name ? (
+          <LowerThird
+            name={name}
+            role={role}
+            accentColor={accentColor}
+            exitFrame={lowerThirdExitFrame}
+            bottom={isSplit ? 60 : 560}
+          />
+        ) : null}
       </AbsoluteFill>
 
       {isSplit ? (
@@ -85,7 +114,9 @@ export const PresenterScene: React.FC<PresenterSceneProps> = ({
         >
           {children}
         </AbsoluteFill>
-      ) : null}
+      ) : (
+        <AbsoluteFill>{children}</AbsoluteFill>
+      )}
     </AbsoluteFill>
   );
 };

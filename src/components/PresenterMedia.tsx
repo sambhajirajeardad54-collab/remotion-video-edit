@@ -1,5 +1,10 @@
 import { Video } from "@remotion/media";
-import { AbsoluteFill, staticFile, useCurrentFrame } from "remotion";
+import {
+  AbsoluteFill,
+  staticFile,
+  useCurrentFrame,
+  useVideoConfig,
+} from "remotion";
 import { theme } from "./theme";
 
 // Shows your talking-head footage, or a placeholder until you have it.
@@ -15,27 +20,72 @@ export const PresenterMedia: React.FC<{
   durationInFrames?: number;
   // Hide the placeholder's text label (for small frames such as circles).
   compact?: boolean;
+  // Start this many frames into the footage (keeps a cut in sync with audio).
+  trimBeforeFrames?: number;
+  // Reframing: starting zoom (1 = fill the frame) and the point to zoom
+  // towards, in % of the frame (e.g. the presenter's face).
+  baseZoom?: number;
+  focusX?: number;
+  focusY?: number;
+  // Framing for footage whose shape differs from the frame (e.g. 864x1920):
+  // sourceAspect = source height / width, containerHeight = height of the
+  // area in px, faceY = where the face sits in the source (0 = top, 1 = bottom).
+  // The footage is positioned so the face is centred, and zooms toward it.
+  sourceAspect?: number;
+  containerHeight?: number;
+  faceY?: number;
 }> = ({
   presenterSrc,
   withAudio,
   zoom = 0.04,
   durationInFrames = 300,
   compact = false,
+  trimBeforeFrames = 0,
+  baseZoom = 1,
+  focusX = 50,
+  focusY = 50,
+  sourceAspect,
+  containerHeight,
+  faceY = 0.36,
 }) => {
   const frame = useCurrentFrame();
-  const scale = 1 + zoom * Math.min(1, frame / durationInFrames);
+  const { width } = useVideoConfig();
+  const scale = baseZoom + zoom * Math.min(1, frame / durationInFrames);
+
+  // Face-centred framing (only when the source shape is given).
+  let boxStyle: React.CSSProperties = { width: "100%", height: "100%" };
+  let originX = focusX;
+  let originY = focusY;
+  if (sourceAspect && containerHeight) {
+    const boxH = width * sourceAspect;
+    const top = Math.min(
+      0,
+      Math.max(containerHeight - boxH, containerHeight / 2 - faceY * boxH),
+    );
+    boxStyle = { position: "absolute", left: 0, top, width, height: boxH };
+    originX = 50;
+    originY = ((top + faceY * boxH) / containerHeight) * 100;
+  }
 
   return (
     <AbsoluteFill style={{ overflow: "hidden" }}>
-      <AbsoluteFill style={{ scale: `${scale}` }}>
+      <AbsoluteFill
+        style={{
+          scale: `${scale}`,
+          transformOrigin: `${originX}% ${originY}%`,
+        }}
+      >
         {presenterSrc ? (
-          <Video
-            name="Presenter footage"
-            src={staticFile(presenterSrc)}
-            muted={!withAudio}
-            objectFit="cover"
-            style={{ width: "100%", height: "100%" }}
-          />
+          <div style={boxStyle}>
+            <Video
+              name="Presenter footage"
+              src={staticFile(presenterSrc)}
+              trimBefore={trimBeforeFrames > 0 ? trimBeforeFrames : undefined}
+              muted={!withAudio}
+              objectFit="cover"
+              style={{ width: "100%", height: "100%" }}
+            />
+          </div>
         ) : (
           <PresenterPlaceholder compact={compact} />
         )}
@@ -52,7 +102,7 @@ const PresenterPlaceholder: React.FC<{ compact: boolean }> = ({ compact }) => {
     <AbsoluteFill
       style={{
         background:
-          "radial-gradient(circle at 50% 35%, #3b3680 0%, #1b1740 55%, #0f0c29 100%)",
+          "radial-gradient(circle at 50% 35%, #1e3a6b 0%, #0a1428 55%, #04070f 100%)",
         justifyContent: "center",
         alignItems: "center",
       }}

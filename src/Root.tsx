@@ -27,6 +27,7 @@ import {
 } from "./scenes/ComponentDemos";
 import { ComponentsShowcase } from "./scenes/ComponentsShowcase";
 import { FullVideoSubtitled } from "./scenes/FullVideoSubtitled";
+import { MpscHistoryVideo } from "./scenes/mpsc-history/MpscHistoryVideo";
 
 // Before the video plays or renders, check which audio files exist in
 // public/audio/. Missing files are skipped, so the video never breaks.
@@ -104,6 +105,18 @@ export const RemotionRoot: React.FC = () => {
         width={VIDEO_WIDTH}
         height={VIDEO_HEIGHT}
       />
+
+      {/* MPSC गट-क · इतिहास: documentary edit of Sam's video (preview: first 18 s). */}
+      <Folder name="MPSC-History">
+        <Composition
+          id="MpscHistoryPreview"
+          component={MpscHistoryVideo}
+          durationInFrames={540}
+          fps={VIDEO_FPS}
+          width={VIDEO_WIDTH}
+          height={VIDEO_HEIGHT}
+        />
+      </Folder>
 
       {/* Individual scenes, for previewing and editing on their own. */}
       <Folder name="Scenes">
@@ -222,6 +235,8 @@ export const RemotionRoot: React.FC = () => {
           height={VIDEO_HEIGHT}
           defaultProps={{
             value: 125000,
+            rangeFrom: null,
+            rangeSeparator: " ते ",
             decimals: 0,
             prefix: "",
             suffix: "",
@@ -255,6 +270,7 @@ export const RemotionRoot: React.FC = () => {
               { heading: "आता", points: ["मुद्दा एक", "मुद्दा दोन"] },
             ],
             accentColor: "#38bdf8",
+            listIcon: "check",
             delay: 8,
             stagger: 14,
             exitFrame: 0,
@@ -303,6 +319,7 @@ export const RemotionRoot: React.FC = () => {
             fontSize: 76,
             maxWidth: 960,
             highlightColor: "#facc15",
+            highlightStyle: "box",
           }}
         />
       </Folder>

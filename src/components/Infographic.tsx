@@ -18,6 +18,8 @@ export const infographicSchema = z.object({
     z.object({ heading: z.string(), points: z.array(z.string()) }),
   ),
   accentColor: z.string(),
+  // Icon for "list": check (tips), cross (myths / not available), dot.
+  listIcon: z.enum(["check", "cross", "dot"]),
   delay: z.number().int().min(0),
   stagger: z.number().int().min(4), // frames between items
   exitFrame: z.number().int().min(0), // 0 = stays until the end
@@ -169,6 +171,7 @@ const Steps: React.FC<InfographicProps> = ({
 const List: React.FC<InfographicProps> = ({
   items,
   accentColor,
+  listIcon,
   delay,
   stagger,
 }) => {
@@ -188,37 +191,17 @@ const List: React.FC<InfographicProps> = ({
               alignItems: "flex-start",
               padding: "30px 36px",
               borderRadius: 28,
-              backgroundColor: theme.card,
+              backgroundColor: "rgba(10,20,40,0.88)",
               border: `2px solid ${theme.cardBorder}`,
               opacity: rowIn,
               translate: `${(1 - rowIn) * 80}px 0px`,
             }}
           >
-            <svg
-              width={64}
-              height={64}
-              viewBox="0 0 64 64"
-              style={{ flexShrink: 0 }}
-            >
-              <circle
-                cx={32}
-                cy={32}
-                r={29}
-                fill="none"
-                stroke={accentColor}
-                strokeWidth={5}
-              />
-              <path
-                d="M 19 33 L 28 42 L 46 23"
-                fill="none"
-                stroke={accentColor}
-                strokeWidth={6}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeDasharray={45}
-                strokeDashoffset={45 * (1 - check)}
-              />
-            </svg>
+            <ListIcon
+              kind={listIcon}
+              color={listIcon === "cross" ? theme.red : accentColor}
+              progress={check}
+            />
             <div>
               <div style={{ fontSize: 52, fontWeight: 800, lineHeight: 1.25 }}>
                 {item.title}
@@ -320,3 +303,37 @@ const Comparison: React.FC<InfographicProps> = ({
     </div>
   );
 };
+
+const ListIcon: React.FC<{
+  kind: "check" | "cross" | "dot";
+  color: string;
+  progress: number;
+}> = ({ kind, color, progress: p }) => (
+  <svg width={64} height={64} viewBox="0 0 64 64" style={{ flexShrink: 0 }}>
+    <circle cx={32} cy={32} r={29} fill="none" stroke={color} strokeWidth={5} />
+    {kind === "check" ? (
+      <path
+        d="M 19 33 L 28 42 L 46 23"
+        fill="none"
+        stroke={color}
+        strokeWidth={6}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeDasharray={45}
+        strokeDashoffset={45 * (1 - p)}
+      />
+    ) : null}
+    {kind === "cross" ? (
+      <path
+        d="M 22 22 L 42 42 M 42 22 L 22 42"
+        fill="none"
+        stroke={color}
+        strokeWidth={6}
+        strokeLinecap="round"
+        strokeDasharray={60}
+        strokeDashoffset={60 * (1 - p)}
+      />
+    ) : null}
+    {kind === "dot" ? <circle cx={32} cy={32} r={10 * p} fill={color} /> : null}
+  </svg>
+);
