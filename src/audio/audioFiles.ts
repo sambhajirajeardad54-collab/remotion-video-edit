@@ -26,7 +26,7 @@ export type AudioAvailability = {
 
 // Checks whether a file exists in public/ before the video uses it.
 // Works the same in Remotion Studio and while rendering.
-const fileExists = async (path: string): Promise<boolean> => {
+export const fileExists = async (path: string): Promise<boolean> => {
   try {
     const res = await fetch(staticFile(path), { method: "HEAD" });
     const type = res.headers.get("content-type") ?? "";

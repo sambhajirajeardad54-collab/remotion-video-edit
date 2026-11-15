@@ -1,5 +1,5 @@
 import { CalculateMetadataFunction, Composition, Folder } from "remotion";
-import { detectAudioFiles } from "./audio/audioFiles";
+import { detectAudioFiles, fileExists } from "./audio/audioFiles";
 import { VIDEO_FPS, VIDEO_HEIGHT, VIDEO_WIDTH } from "./data/videoConfig";
 import {
   DocumentaryScene,
@@ -27,7 +27,10 @@ import {
 } from "./scenes/ComponentDemos";
 import { ComponentsShowcase } from "./scenes/ComponentsShowcase";
 import { FullVideoSubtitled } from "./scenes/FullVideoSubtitled";
-import { MpscHistoryVideo } from "./scenes/mpsc-history/MpscHistoryVideo";
+import {
+  MpscHistoryVideo,
+  mpscHistorySchema,
+} from "./scenes/mpsc-history/MpscHistoryVideo";
 import { MpscHistoryThumbnail } from "./scenes/mpsc-history/MpscHistoryThumbnail";
 
 // Before the video plays or renders, check which audio files exist in
@@ -112,6 +115,19 @@ export const RemotionRoot: React.FC = () => {
         <Composition
           id="MpscHistory"
           component={MpscHistoryVideo}
+          schema={mpscHistorySchema}
+          defaultProps={{ cutoutFound: false }}
+          calculateMetadata={async ({ props }) => {
+            const cutoutFound = await fileExists(
+              "videos/mpsc-history/presenter-cutout.webm",
+            );
+            if (!cutoutFound) {
+              console.warn(
+                "MpscHistory: presenter-cutout.webm not found, using the original footage in the circle. See scripts/remove-background to regenerate it.",
+              );
+            }
+            return { props: { ...props, cutoutFound } };
+          }}
           durationInFrames={1290}
           fps={VIDEO_FPS}
           width={VIDEO_WIDTH}

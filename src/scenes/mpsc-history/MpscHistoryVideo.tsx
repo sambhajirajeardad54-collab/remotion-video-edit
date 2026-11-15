@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { Audio } from "@remotion/media";
 import {
   AbsoluteFill,
@@ -68,7 +69,28 @@ const NAMEPLATE_TOP = CIRCLE.centerY - 36;
 const SUBTITLE_Y = 1080;
 const SUBTITLE_ZONES = [{ fromMs: 12600, toMs: 15600, centerY: 1560 }];
 
-export const MpscHistoryVideo: React.FC = () => {
+// The cutout is a generated file (not in Git). Root.tsx checks whether it
+// exists; if not, the circle falls back to the original footage so the
+// video still renders. Regenerate the cutout with:
+//   python3 scripts/remove-background/matte_video.py \
+//     public/videos/mpsc-history/source.mp4 /tmp/cutout.webm
+//   scripts/remove-background/mask-burned-in-poster.sh \
+//     /tmp/cutout.webm public/videos/mpsc-history/presenter-cutout.webm
+export const mpscHistorySchema = z.object({ cutoutFound: z.boolean() });
+
+export const MpscHistoryVideo: React.FC<z.infer<typeof mpscHistorySchema>> = ({
+  cutoutFound,
+}) => {
+  // Fallback: original footage, zoomed to fill the whole circle.
+  const circle = cutoutFound
+    ? CIRCLE
+    : {
+        ...CIRCLE,
+        src: SOURCE,
+        scale: undefined,
+        fill: 1.05,
+        fadeBottomFrom: undefined,
+      };
   return (
     <AbsoluteFill style={{ backgroundColor: theme.backgroundDeep }}>
       {/* Studio backdrop for all presenter sections (C and I cover it). */}
@@ -344,10 +366,10 @@ export const MpscHistoryVideo: React.FC = () => {
       {/* Talking head in a fixed circle: 0-12.6 s, then (after the PDF
           cutaway) 15.6-41.5 s. Hidden during C and the end card. */}
       <Sequence name="Circle · A-B" durationInFrames={378}>
-        <CircularPresenter {...CIRCLE} exitAt={366} />
+        <CircularPresenter {...circle} exitAt={366} />
       </Sequence>
       <Sequence name="Circle · D-H" from={468} durationInFrames={777}>
-        <CircularPresenter {...CIRCLE} trimBeforeFrames={468} exitAt={765} />
+        <CircularPresenter {...circle} trimBeforeFrames={468} exitAt={765} />
       </Sequence>
       <Sequence name="Name · B" from={156} durationInFrames={98}>
         <CircleNameplate
