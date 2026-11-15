@@ -24,3 +24,7 @@ public/videos/raw-video/*
 !public/videos/raw-video/README.md
 public/videos/reference-video/*
 !public/videos/reference-video/README.md
+
+# Generated files: background-removal cutouts and downloaded AI models.
+public/videos/cutouts/
+*.onnx
