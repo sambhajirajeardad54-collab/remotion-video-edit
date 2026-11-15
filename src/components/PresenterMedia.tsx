@@ -41,9 +41,10 @@ export const PresenterMedia: React.FC<{
   foregroundSrc?: string;
   // Move the whole presenter down (px), e.g. to make room for graphics.
   shiftY?: number;
-  // Cutout only: below this fraction of the source height the original
-  // footage is laid underneath, filling any gaps the background removal left
-  // in the torso (for shots where the body continues to the bottom edge).
+  // Cutout only, OFF unless set: below this fraction of the source height
+  // the original footage is laid underneath to fill gaps in the cutout. It
+  // can show the original background where the body does not reach, so
+  // prefer fixing the cutout itself (scripts/remove-background).
   torsoFillFrom?: number;
 }> = ({
   presenterSrc,
@@ -60,7 +61,7 @@ export const PresenterMedia: React.FC<{
   faceY = 0.36,
   foregroundSrc,
   shiftY = 0,
-  torsoFillFrom = 0.625,
+  torsoFillFrom,
 }) => {
   const frame = useCurrentFrame();
   const { width } = useVideoConfig();
@@ -83,8 +84,8 @@ export const PresenterMedia: React.FC<{
   const spotlightY =
     originY + (containerHeight ? (shiftY / containerHeight) * 100 : 0);
   const trim = trimBeforeFrames > 0 ? trimBeforeFrames : undefined;
-  const fill = `${torsoFillFrom * 100}%`;
-  const fillSoft = `${(torsoFillFrom + 0.04) * 100}%`;
+  const fill = `${(torsoFillFrom ?? 1) * 100}%`;
+  const fillSoft = `${((torsoFillFrom ?? 1) + 0.04) * 100}%`;
 
   return (
     <AbsoluteFill style={{ overflow: "hidden" }}>
@@ -98,7 +99,7 @@ export const PresenterMedia: React.FC<{
       >
         {presenterSrc ? (
           <div style={boxStyle}>
-            {foregroundSrc ? (
+            {foregroundSrc && torsoFillFrom !== undefined ? (
               <Video
                 name="Presenter torso fill"
                 src={staticFile(presenterSrc)}

@@ -28,6 +28,7 @@ import {
 import { ComponentsShowcase } from "./scenes/ComponentsShowcase";
 import { FullVideoSubtitled } from "./scenes/FullVideoSubtitled";
 import { MpscHistoryVideo } from "./scenes/mpsc-history/MpscHistoryVideo";
+import { MpscHistoryThumbnail } from "./scenes/mpsc-history/MpscHistoryThumbnail";
 
 // Before the video plays or renders, check which audio files exist in
 // public/audio/. Missing files are skipped, so the video never breaks.
@@ -112,6 +113,15 @@ export const RemotionRoot: React.FC = () => {
           id="MpscHistory"
           component={MpscHistoryVideo}
           durationInFrames={1290}
+          fps={VIDEO_FPS}
+          width={VIDEO_WIDTH}
+          height={VIDEO_HEIGHT}
+        />
+        {/* Cover image: render the last frame (59) as the PNG thumbnail. */}
+        <Composition
+          id="MpscHistoryThumbnail"
+          component={MpscHistoryThumbnail}
+          durationInFrames={60}
           fps={VIDEO_FPS}
           width={VIDEO_WIDTH}
           height={VIDEO_HEIGHT}

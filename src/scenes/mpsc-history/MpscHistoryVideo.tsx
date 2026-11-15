@@ -327,7 +327,7 @@ export const MpscHistoryVideo: React.FC = () => {
               <CommentCTA
                 variant="dm"
                 label="तरच"
-                text="PDF → तुमच्या DM मध्ये"
+                text="PDF मिळेल DM मध्ये"
                 accentColor={Y}
                 delay={0}
                 exitFrame={62}
