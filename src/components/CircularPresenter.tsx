@@ -5,6 +5,7 @@ import {
   staticFile,
   useCurrentFrame,
 } from "remotion";
+import { assertNotReference } from "../workflow/media";
 import "./fonts";
 import { EASE_IN_OUT, EASE_OUT } from "./motion";
 import { theme } from "./theme";
@@ -61,6 +62,7 @@ export const CircularPresenter: React.FC<CircularPresenterProps> = ({
   exitAt = 0,
   ringWidth = 10,
 }) => {
+  assertNotReference(src, "CircularPresenter");
   const frame = useCurrentFrame();
 
   // Either cover the circle completely, or use an exact zoom; then place

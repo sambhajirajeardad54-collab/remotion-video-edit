@@ -1,6 +1,12 @@
 import { CalculateMetadataFunction, Composition, Folder } from "remotion";
 import { detectAudioFiles, fileExists } from "./audio/audioFiles";
 import { VIDEO_FPS, VIDEO_HEIGHT, VIDEO_WIDTH } from "./data/videoConfig";
+import { projectSchema } from "./workflow/projectConfig";
+import { mpscGroupCHistoryProject } from "./workflow/projects/mpsc-group-c-history";
+import {
+  calculateProjectMetadata,
+  TalkingHeadVideo,
+} from "./workflow/TalkingHeadVideo";
 import {
   DocumentaryScene,
   documentarySceneSchema,
@@ -141,6 +147,22 @@ export const RemotionRoot: React.FC = () => {
           fps={VIDEO_FPS}
           width={VIDEO_WIDTH}
           height={VIDEO_HEIGHT}
+        />
+      </Folder>
+
+      {/* Reusable production workflow (docs/VIDEO-WORKFLOW.md): one project
+          config per video. New project = copy the example config. */}
+      <Folder name="Workflow">
+        <Composition
+          id="TalkingHeadTemplate"
+          component={TalkingHeadVideo}
+          schema={projectSchema}
+          calculateMetadata={calculateProjectMetadata}
+          durationInFrames={mpscGroupCHistoryProject.durationInFrames}
+          fps={VIDEO_FPS}
+          width={VIDEO_WIDTH}
+          height={VIDEO_HEIGHT}
+          defaultProps={mpscGroupCHistoryProject}
         />
       </Folder>
 
