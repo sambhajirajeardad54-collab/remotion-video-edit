@@ -13,3 +13,4 @@ build
 *.cutout.webm
 presenter-cutout.webm
 scripts/remove-background/modnet.onnx
+__pycache__/
