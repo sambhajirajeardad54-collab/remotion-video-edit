@@ -14,7 +14,10 @@ import { Infographic } from "../../components/Infographic";
 import { KineticHeadline } from "../../components/KineticHeadline";
 import { NumberCounter } from "../../components/NumberCounter";
 import { PhoneMockup } from "../../components/PhoneMockup";
-import { PresenterScene } from "../../components/PresenterScene";
+import {
+  CircleNameplate,
+  CircularPresenter,
+} from "../../components/CircularPresenter";
 import { SceneBackground } from "../../components/SceneBackground";
 import { Subtitles } from "../../components/Subtitles";
 import { theme } from "../../components/theme";
@@ -26,43 +29,48 @@ import {
 
 // MPSC गट-क · इतिहास विभाग: documentary edit of Sam's original video.
 //
-// The original voice plays as ONE continuous track. Picture edits are cuts
-// at the same frame in both footage and timeline (trimBeforeFrames = cut
-// frame), with overlay transitions on top, so sync can never drift.
+// The original voice plays as ONE continuous track. The talking head is shown
+// in a fixed circle (CircularPresenter) whose footage is trimmed to the same
+// frame as the timeline, with overlay transitions on top, so sync can never
+// drift.
 //
 // Full length: 1290 frames (43 s). Timings come from the word timestamps.
 const SOURCE = "videos/mpsc-history/source.mp4";
-const SOURCE_ASPECT = 1920 / 864; // source footage is 864 x 1920
-const FACE_Y = 0.36; // face centre, as a fraction of source height
 // Presenter with the background removed (transparent WebM, same timing).
 const CUTOUT = "videos/mpsc-history/presenter-cutout.webm";
 const Y = theme.accent; // yellow
 
+// The circular talking head: fixed size and position for the whole video.
+// Top graphics end above y≈730, subtitles start below y≈1460.
+const CIRCLE = {
+  src: CUTOUT,
+  diameter: 680,
+  centerX: 540,
+  centerY: 1090,
+  sourceWidth: 864,
+  sourceHeight: 1920,
+  faceX: 0.5,
+  faceY: 0.36, // face centre in the source footage
+  faceAt: 0.47, // face sits just above the circle's centre (room for hair)
+};
+// Name plate on the top edge of the circle: clear of the face and subtitles.
+const NAMEPLATE_TOP = CIRCLE.centerY - CIRCLE.diameter / 2 - 40;
+
 export const MpscHistoryVideo: React.FC = () => {
   return (
     <AbsoluteFill style={{ backgroundColor: theme.backgroundDeep }}>
+      {/* Studio backdrop for all presenter sections (C and I cover it). */}
+      <SceneBackground spotlightY={(CIRCLE.centerY / 1920) * 100} />
+
       {/* A · 0.0-4.8 s · Hook: "MPSC ग्रुप C… जवळपास 12 ते 13 क्वेश्चन" */}
       <Sequence name="A · Hook" durationInFrames={144}>
-        <PresenterScene
-          presenterSrc={SOURCE}
-          withAudio={false}
-          layout="top-half"
-          name=""
-          role=""
-          accentColor={Y}
-          lowerThirdExitFrame={0}
-          sourceAspect={SOURCE_ASPECT}
-          faceY={FACE_Y}
-          baseZoom={1}
-          zoom={0.08}
-          zoomDurationInFrames={144}
-        >
+        <AbsoluteFill style={{ alignItems: "center", paddingTop: 150 }}>
           <div
             style={{
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
-              gap: 50,
+              gap: 24,
             }}
           >
             <KineticHeadline
@@ -91,69 +99,53 @@ export const MpscHistoryVideo: React.FC = () => {
               exitFrame={0}
             />
           </div>
-        </PresenterScene>
+        </AbsoluteFill>
       </Sequence>
 
       {/* B · 4.8-12.6 s · "एकाच बुकमधून… ओल्ड महाराष्ट्र स्टेट बोर्ड… नेटवर अवेलेबल नाही" */}
       <Sequence name="B · One book" from={144} durationInFrames={234}>
-        <PresenterScene
-          presenterSrc={SOURCE}
-          withAudio={false}
-          layout="full"
-          name="Sam Xplains"
-          role="MPSC · इतिहास मार्गदर्शन"
-          accentColor={Y}
-          lowerThirdExitFrame={100}
-          trimBeforeFrames={144}
-          sourceAspect={SOURCE_ASPECT}
-          faceY={FACE_Y}
-          baseZoom={1.12}
-          zoom={0.12}
-          zoomDurationInFrames={234}
-        >
-          <TopOverlay>
-            <Sequence from={42} durationInFrames={58} layout="none">
-              <KineticHeadline
-                kicker=""
-                text="*एकाच* बुकमधून सोडवा!"
-                icon="none"
-                fontSize={104}
-                align="center"
-                accentColor={Y}
-                delay={0}
-                exitFrame={48}
-              />
-            </Sequence>
-            <Sequence from={90} durationInFrames={60} layout="none">
-              <KineticHeadline
-                kicker="पुस्तक"
-                text="*ओल्ड* महाराष्ट्र स्टेट बोर्ड"
-                icon="book"
-                fontSize={84}
-                align="left"
-                accentColor={Y}
-                delay={0}
-                exitFrame={50}
-              />
-            </Sequence>
-            <Sequence from={150} durationInFrames={84} layout="none">
-              <Infographic
-                variant="list"
-                title=""
-                items={[
-                  { title: "नेटवर कुठेही उपलब्ध नाही", description: "" },
-                  { title: "टेलिग्रामवर लिंक मिळत नाही", description: "" },
-                ]}
-                columns={[]}
-                accentColor={Y}
-                listIcon="cross"
-                delay={1}
-                stagger={21}
-                exitFrame={78}
-              />
-            </Sequence>
-          </TopOverlay>
-        </PresenterScene>
+        <TopOverlay>
+          <Sequence from={42} durationInFrames={58} layout="none">
+            <KineticHeadline
+              kicker=""
+              text="*एकाच* बुकमधून सोडवा!"
+              icon="none"
+              fontSize={104}
+              align="center"
+              accentColor={Y}
+              delay={0}
+              exitFrame={48}
+            />
+          </Sequence>
+          <Sequence from={90} durationInFrames={60} layout="none">
+            <KineticHeadline
+              kicker="पुस्तक"
+              text="*ओल्ड* महाराष्ट्र स्टेट बोर्ड"
+              icon="book"
+              fontSize={84}
+              align="left"
+              accentColor={Y}
+              delay={0}
+              exitFrame={50}
+            />
+          </Sequence>
+          <Sequence from={150} durationInFrames={84} layout="none">
+            <Infographic
+              variant="list"
+              title=""
+              items={[
+                { title: "नेटवर कुठेही उपलब्ध नाही", description: "" },
+                { title: "टेलिग्रामवर लिंक मिळत नाही", description: "" },
+              ]}
+              columns={[]}
+              accentColor={Y}
+              listIcon="cross"
+              delay={1}
+              stagger={21}
+              exitFrame={78}
+            />
+          </Sequence>
+        </TopOverlay>
       </Sequence>
 
       {/* C · 12.6-15.6 s · Original cutaway to the book PDF, now in a phone */}
@@ -200,33 +192,16 @@ export const MpscHistoryVideo: React.FC = () => {
 
       {/* D · 15.6-18.0 s · "डायरेक्ट तुमच्या DM मध्ये पाठवून देतो" */}
       <Sequence name="D · DM" from={468} durationInFrames={72}>
-        <PresenterScene
-          presenterSrc={SOURCE}
-          withAudio={false}
-          layout="full"
-          name=""
-          role=""
-          accentColor={Y}
-          lowerThirdExitFrame={0}
-          trimBeforeFrames={468}
-          sourceAspect={SOURCE_ASPECT}
-          faceY={FACE_Y}
-          foregroundSrc={CUTOUT}
-          baseZoom={1.22}
-          zoom={0.05}
-          zoomDurationInFrames={72}
-        >
-          <TopOverlay>
-            <CommentCTA
-              variant="dm"
-              label="थेट तुमच्या DM मध्ये"
-              text="PDF पाठवतो"
-              accentColor={Y}
-              delay={24}
-              exitFrame={0}
-            />
-          </TopOverlay>
-        </PresenterScene>
+        <TopOverlay>
+          <CommentCTA
+            variant="dm"
+            label="थेट तुमच्या DM मध्ये"
+            text="PDF पाठवतो"
+            accentColor={Y}
+            delay={24}
+            exitFrame={0}
+          />
+        </TopOverlay>
       </Sequence>
 
       {/* E · 18.1-24.4 s · "यामध्ये दिलेलं काय… समाजसुधारक, ब्रिटिशकालीन भारत,
@@ -236,192 +211,149 @@ export const MpscHistoryVideo: React.FC = () => {
         from={543}
         durationInFrames={189}
       >
-        <PresenterScene
-          presenterSrc={SOURCE}
-          withAudio={false}
-          layout="full"
-          name=""
-          role=""
-          accentColor={Y}
-          lowerThirdExitFrame={0}
-          trimBeforeFrames={543}
-          sourceAspect={SOURCE_ASPECT}
-          faceY={FACE_Y}
-          foregroundSrc={CUTOUT}
-          shiftY={150}
-          baseZoom={1}
-          zoom={0.03}
-          zoomDurationInFrames={189}
-        >
-          <TopOverlay>
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: 34,
-                width: 940,
-              }}
-            >
-              <KineticHeadline
-                kicker="या पुस्तकात"
-                text="काय *कव्हर* केलं आहे?"
-                icon="book"
-                fontSize={78}
-                align="left"
-                accentColor={Y}
-                delay={0}
-                exitFrame={0}
-              />
-              <Infographic
-                variant="chips"
-                title=""
-                items={[
-                  { title: "समाजसुधारक", description: "" },
-                  { title: "ब्रिटिशकालीन भारत", description: "" },
-                  { title: "महाराष्ट्रातील चळवळी", description: "" },
-                ]}
-                columns={[]}
-                accentColor={Y}
-                listIcon="check"
-                delay={25}
-                stagger={39}
-                exitFrame={0}
-              />
-            </div>
-          </TopOverlay>
-        </PresenterScene>
+        <TopOverlay>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 34,
+              width: 940,
+            }}
+          >
+            <KineticHeadline
+              kicker="या पुस्तकात"
+              text="काय *कव्हर* केलं आहे?"
+              icon="book"
+              fontSize={78}
+              align="left"
+              accentColor={Y}
+              delay={0}
+              exitFrame={0}
+            />
+            <Infographic
+              variant="chips"
+              title=""
+              items={[
+                { title: "समाजसुधारक", description: "" },
+                { title: "ब्रिटिशकालीन भारत", description: "" },
+                { title: "महाराष्ट्रातील चळवळी", description: "" },
+              ]}
+              columns={[]}
+              accentColor={Y}
+              listIcon="check"
+              delay={25}
+              stagger={39}
+              exitFrame={0}
+            />
+          </div>
+        </TopOverlay>
       </Sequence>
 
       {/* F · 24.4-29.8 s · "तर हे बुकसाठी… Sam Xplains चॅनलला फॉलो केलं पाहिजे,
           तरच PDF… DM…" (same cutout framing as E, so no visible cut) */}
       <Sequence name="F · Follow for PDF" from={732} durationInFrames={162}>
-        <PresenterScene
-          presenterSrc={SOURCE}
-          withAudio={false}
-          layout="full"
-          name=""
-          role=""
-          accentColor={Y}
-          lowerThirdExitFrame={0}
-          trimBeforeFrames={732}
-          sourceAspect={SOURCE_ASPECT}
-          faceY={FACE_Y}
-          foregroundSrc={CUTOUT}
-          shiftY={150}
-          baseZoom={1.03}
-          zoom={0.04}
-          zoomDurationInFrames={162}
-        >
-          <TopOverlay>
-            <Sequence from={42} durationInFrames={48} layout="none">
-              <CommentCTA
-                variant="follow"
-                label="आधी हे करा"
-                text="Sam Xplains"
-                accentColor={Y}
-                delay={0}
-                exitFrame={44}
-              />
-            </Sequence>
-            <Sequence from={90} durationInFrames={72} layout="none">
-              <CommentCTA
-                variant="dm"
-                label="तरच"
-                text="PDF मिळेल DM मध्ये"
-                accentColor={Y}
-                delay={0}
-                exitFrame={62}
-              />
-            </Sequence>
-          </TopOverlay>
-        </PresenterScene>
+        <TopOverlay>
+          <Sequence from={42} durationInFrames={48} layout="none">
+            <CommentCTA
+              variant="follow"
+              label="आधी हे करा"
+              text="Sam Xplains"
+              accentColor={Y}
+              delay={0}
+              exitFrame={44}
+            />
+          </Sequence>
+          <Sequence from={90} durationInFrames={72} layout="none">
+            <CommentCTA
+              variant="dm"
+              label="तरच"
+              text="PDF मिळेल DM मध्ये"
+              accentColor={Y}
+              delay={0}
+              exitFrame={62}
+            />
+          </Sequence>
+        </TopOverlay>
       </Sequence>
 
       {/* G · 29.8-35.5 s · "हिस्ट्री हा खूप हाय स्कोरिंग सब्जेक्ट… एक बुक
           रेफर केलं…" Real camera shot with a slow documentary push-in. */}
       <Sequence name="G · High scoring" from={894} durationInFrames={171}>
-        <PresenterScene
-          presenterSrc={SOURCE}
-          withAudio={false}
-          layout="full"
-          name=""
-          role=""
-          accentColor={Y}
-          lowerThirdExitFrame={0}
-          trimBeforeFrames={894}
-          sourceAspect={SOURCE_ASPECT}
-          faceY={FACE_Y}
-          baseZoom={1.08}
-          zoom={0.2}
-          zoomDurationInFrames={171}
-        >
-          <TopOverlay>
-            <Sequence from={18} durationInFrames={75} layout="none">
-              <KineticHeadline
-                kicker="MPSC · इतिहास"
-                text="*हिस्ट्री* = हाय स्कोरिंग विषय"
-                icon="target"
-                fontSize={86}
-                align="left"
-                accentColor={Y}
-                delay={0}
-                exitFrame={66}
-              />
-            </Sequence>
-            <Sequence from={96} durationInFrames={75} layout="none">
-              <KineticHeadline
-                kicker=""
-                text="*एक पुस्तक* → हाय स्कोर"
-                icon="book"
-                fontSize={96}
-                align="left"
-                accentColor={Y}
-                delay={0}
-                exitFrame={0}
-              />
-            </Sequence>
-          </TopOverlay>
-        </PresenterScene>
+        <TopOverlay>
+          <Sequence from={18} durationInFrames={75} layout="none">
+            <KineticHeadline
+              kicker="MPSC · इतिहास"
+              text="*हिस्ट्री* = हाय स्कोरिंग विषय"
+              icon="target"
+              fontSize={86}
+              align="left"
+              accentColor={Y}
+              delay={0}
+              exitFrame={66}
+            />
+          </Sequence>
+          <Sequence from={96} durationInFrames={75} layout="none">
+            <KineticHeadline
+              kicker=""
+              text="*एक पुस्तक* → हाय स्कोर"
+              icon="book"
+              fontSize={96}
+              align="left"
+              accentColor={Y}
+              delay={0}
+              exitFrame={0}
+            />
+          </Sequence>
+        </TopOverlay>
       </Sequence>
 
       {/* H · 35.5-41.5 s · Outro: "…कशी वाटते?… Sam Xplains चॅनलला फॉलो
           करायला विसरू नका." */}
       <Sequence name="H · Outro" from={1065} durationInFrames={180}>
-        <PresenterScene
-          presenterSrc={SOURCE}
-          withAudio={false}
-          layout="full"
-          name="Sam Xplains"
-          role="MPSC · इतिहास मार्गदर्शन"
-          accentColor={Y}
-          lowerThirdExitFrame={95}
-          trimBeforeFrames={1065}
-          sourceAspect={SOURCE_ASPECT}
-          faceY={FACE_Y}
-          foregroundSrc={CUTOUT}
-          shiftY={150}
-          baseZoom={1.03}
-          zoom={0.05}
-          zoomDurationInFrames={180}
-        >
-          <TopOverlay>
-            <Sequence from={128} durationInFrames={52} layout="none">
-              <CommentCTA
-                variant="follow"
-                label="विसरू नका!"
-                text="Sam Xplains"
-                accentColor={Y}
-                delay={0}
-                exitFrame={0}
-              />
-            </Sequence>
-          </TopOverlay>
-        </PresenterScene>
+        <TopOverlay>
+          <Sequence from={128} durationInFrames={52} layout="none">
+            <CommentCTA
+              variant="follow"
+              label="विसरू नका!"
+              text="Sam Xplains"
+              accentColor={Y}
+              delay={0}
+              exitFrame={0}
+            />
+          </Sequence>
+        </TopOverlay>
       </Sequence>
 
       {/* I · 41.5-43.0 s · End card (no speech) */}
       <Sequence name="I · End card" from={1245} durationInFrames={45}>
         <EndCard />
+      </Sequence>
+
+      {/* Talking head in a fixed circle: 0-12.6 s, then (after the PDF
+          cutaway) 15.6-41.5 s. Hidden during C and the end card. */}
+      <Sequence name="Circle · A-B" durationInFrames={378}>
+        <CircularPresenter {...CIRCLE} exitAt={366} />
+      </Sequence>
+      <Sequence name="Circle · D-H" from={468} durationInFrames={777}>
+        <CircularPresenter {...CIRCLE} trimBeforeFrames={468} exitAt={765} />
+      </Sequence>
+      <Sequence name="Name · B" from={156} durationInFrames={98}>
+        <CircleNameplate
+          name="Sam Xplains"
+          role="MPSC · इतिहास मार्गदर्शन"
+          centerX={CIRCLE.centerX}
+          top={NAMEPLATE_TOP}
+          exitAt={88}
+        />
+      </Sequence>
+      <Sequence name="Name · H" from={1077} durationInFrames={93}>
+        <CircleNameplate
+          name="Sam Xplains"
+          role="MPSC · इतिहास मार्गदर्शन"
+          centerX={CIRCLE.centerX}
+          top={NAMEPLATE_TOP}
+          exitAt={83}
+        />
       </Sequence>
 
       {/* Transitions over the cuts (do not change timing). */}
@@ -444,11 +376,11 @@ export const MpscHistoryVideo: React.FC = () => {
         <DipToBlack />
       </Sequence>
 
-      {/* Subtitles: higher during the split-screen hook, lower-middle after. */}
+      {/* Subtitles: lower-middle, below the circle, throughout. */}
       <Subtitles
         captions={MPSC_HISTORY_CAPTIONS_HOOK}
-        centerY={945}
-        fontSize={62}
+        centerY={1560}
+        fontSize={72}
         maxWidth={960}
         highlightColor={Y}
         highlightStyle="text"
