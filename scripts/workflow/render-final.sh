@@ -13,6 +13,10 @@ npx remotion render "$ID" "$OUTF" --codec=h264 --crf=16 --x264-preset=slow \
 echo "== verify"
 ffprobe -v error -show_entries stream=codec_name,width,height,r_frame_rate:format=duration,size -of compact "$OUTF"
 ffmpeg -v error -i "$OUTF" -f null - && echo "full decode: OK"
-ffmpeg -i "$OUTF" -af ebur128=peak=true -f null - 2>&1 | grep -E "^\s+(I:|Peak:)"
+if ffprobe -v error -select_streams a -show_entries stream=codec_type -of csv=p=0 "$OUTF" | grep -q audio; then
+  ffmpeg -i "$OUTF" -af ebur128=peak=true -f null - 2>&1 | grep -E "^\s+(I:|Peak:)" || true
+else
+  echo "no audio track (silent composition)"
+fi
 ffmpeg -i "$OUTF" -vf "blackdetect=d=0.1:pix_th=0.05" -an -f null - 2>&1 | grep -q black_start && echo "WARNING: black frames found" || echo "no black frames"
 echo "Final video: $OUTF"
