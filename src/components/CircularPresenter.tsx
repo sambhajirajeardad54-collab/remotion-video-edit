@@ -31,6 +31,13 @@ export type CircularPresenterProps = {
   faceY?: number;
   faceAt?: number; // where the face centre sits in the circle (0 = top, 1 = bottom)
   fill?: number; // extra zoom over the minimum needed to cover the circle
+  // Exact zoom of the source (e.g. 0.42 to zoom out and show the whole head
+  // and shoulders). Use with background-removed footage: areas outside the
+  // source are transparent and show the circle's studio gradient.
+  scale?: number;
+  // Soft fade of the footage into the studio gradient from this fraction of
+  // the circle height downwards (e.g. 0.86). Undefined = no fade.
+  fadeBottomFrom?: number;
   enterFrames?: number;
   exitAt?: number; // frame (within the sequence) to start the exit; 0 = none
   ringWidth?: number;
@@ -48,25 +55,31 @@ export const CircularPresenter: React.FC<CircularPresenterProps> = ({
   faceY = 0.36,
   faceAt = 0.44,
   fill = 1.07,
+  scale: fixedScale,
+  fadeBottomFrom,
   enterFrames = 18,
   exitAt = 0,
   ringWidth = 10,
 }) => {
   const frame = useCurrentFrame();
 
-  // Cover the circle completely, then place the face.
+  // Either cover the circle completely, or use an exact zoom; then place
+  // the face (faceX, faceY in the source) at (centre, faceAt) of the circle.
   const scale =
+    fixedScale ??
     Math.max(diameter / sourceWidth, diameter / sourceHeight) * fill;
   const boxW = sourceWidth * scale;
   const boxH = sourceHeight * scale;
-  const left = Math.min(
-    0,
-    Math.max(diameter - boxW, diameter / 2 - faceX * boxW),
-  );
-  const top = Math.min(
-    0,
-    Math.max(diameter - boxH, faceAt * diameter - faceY * boxH),
-  );
+  const idealLeft = diameter / 2 - faceX * boxW;
+  const idealTop = faceAt * diameter - faceY * boxH;
+  const left =
+    fixedScale === undefined
+      ? Math.min(0, Math.max(diameter - boxW, idealLeft))
+      : idealLeft;
+  const top =
+    fixedScale === undefined
+      ? Math.min(0, Math.max(diameter - boxH, idealTop))
+      : idealTop;
 
   const enter = interpolate(frame, [0, enterFrames], [0, 1], {
     extrapolateLeft: "clamp",
@@ -122,20 +135,31 @@ export const CircularPresenter: React.FC<CircularPresenterProps> = ({
           <div
             style={{
               position: "absolute",
-              left,
-              top,
-              width: boxW,
-              height: boxH,
+              inset: 0,
+              maskImage:
+                fadeBottomFrom === undefined
+                  ? undefined
+                  : `linear-gradient(180deg, black ${fadeBottomFrom * 100}%, transparent ${Math.min(100, (fadeBottomFrom + 0.1) * 100)}%)`,
             }}
           >
-            <Video
-              name="Circular presenter"
-              src={staticFile(src)}
-              trimBefore={trimBeforeFrames > 0 ? trimBeforeFrames : undefined}
-              muted
-              objectFit="cover"
-              style={{ width: "100%", height: "100%" }}
-            />
+            <div
+              style={{
+                position: "absolute",
+                left,
+                top,
+                width: boxW,
+                height: boxH,
+              }}
+            >
+              <Video
+                name="Circular presenter"
+                src={staticFile(src)}
+                trimBefore={trimBeforeFrames > 0 ? trimBeforeFrames : undefined}
+                muted
+                objectFit="cover"
+                style={{ width: "100%", height: "100%" }}
+              />
+            </div>
           </div>
           {/* Subtle inner vignette for depth. */}
           <div
@@ -159,7 +183,9 @@ export const CircleNameplate: React.FC<{
   centerX: number;
   top: number;
   exitAt?: number;
-}> = ({ name, role, centerX, top, exitAt = 0 }) => {
+  // "center": centred on centerX. "left": starts at centerX (left edge).
+  align?: "center" | "left";
+}> = ({ name, role, centerX, top, exitAt = 0, align = "center" }) => {
   const frame = useCurrentFrame();
   const enter = interpolate(frame, [0, 14], [0, 1], {
     extrapolateLeft: "clamp",
@@ -180,7 +206,7 @@ export const CircleNameplate: React.FC<{
           position: "absolute",
           top,
           left: centerX,
-          translate: `-50% ${(1 - enter) * 16}px`,
+          translate: `${align === "center" ? "-50%" : "0px"} ${(1 - enter) * 16}px`,
           display: "flex",
           alignItems: "baseline",
           gap: 16,

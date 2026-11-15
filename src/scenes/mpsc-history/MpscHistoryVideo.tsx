@@ -40,27 +40,39 @@ const SOURCE = "videos/mpsc-history/source.mp4";
 const CUTOUT = "videos/mpsc-history/presenter-cutout.webm";
 const Y = theme.accent; // yellow
 
-// The circular talking head: fixed size and position for the whole video.
-// Top graphics end above y≈730, subtitles start below y≈1460.
+// The circular talking head: fixed in the bottom-right corner.
+// Framing measured from the footage (median over 76 samples, source px):
+// hair top y 438, chin ≈ y 1050, face centre x 420 → head centre (420, 744).
+// At scale 0.42 the 610 px head is ≈ 255 px tall in the 420 px circle, so the
+// whole head, hair, ears, chin and upper shoulders stay inside the circle.
 const CIRCLE = {
   src: CUTOUT,
-  diameter: 680,
-  centerX: 540,
-  centerY: 1090,
+  diameter: 420,
+  centerX: 1080 - 50 - 220, // 50 px right margin (ring included)
+  centerY: 1920 - 250 - 220, // 250 px bottom margin, clear of app UI
   sourceWidth: 864,
   sourceHeight: 1920,
-  faceX: 0.5,
-  faceY: 0.36, // face centre in the source footage
-  faceAt: 0.47, // face sits just above the circle's centre (room for hair)
+  faceX: 420 / 864,
+  faceY: 744 / 1920,
+  faceAt: 0.5, // head centred in the circle
+  scale: 0.42,
+  // Shoulders fade softly into the studio gradient at the bottom (this also
+  // keeps the original video's burned-in poster at 0-3 s out of the circle).
+  fadeBottomFrom: 0.9,
 };
-// Name plate on the top edge of the circle: clear of the face and subtitles.
-const NAMEPLATE_TOP = CIRCLE.centerY - CIRCLE.diameter / 2 - 40;
+// Name plate to the left of the circle, level with its centre.
+const NAMEPLATE_LEFT = 60;
+const NAMEPLATE_TOP = CIRCLE.centerY - 36;
+// Subtitles sit in the middle of the screen, above the circle; during the
+// PDF phone scene (no circle) they return to the lower-middle.
+const SUBTITLE_Y = 1080;
+const SUBTITLE_ZONES = [{ fromMs: 12600, toMs: 15600, centerY: 1560 }];
 
 export const MpscHistoryVideo: React.FC = () => {
   return (
     <AbsoluteFill style={{ backgroundColor: theme.backgroundDeep }}>
       {/* Studio backdrop for all presenter sections (C and I cover it). */}
-      <SceneBackground spotlightY={(CIRCLE.centerY / 1920) * 100} />
+      <SceneBackground spotlightY={45} />
 
       {/* A · 0.0-4.8 s · Hook: "MPSC ग्रुप C… जवळपास 12 ते 13 क्वेश्चन" */}
       <Sequence name="A · Hook" durationInFrames={144}>
@@ -340,18 +352,20 @@ export const MpscHistoryVideo: React.FC = () => {
       <Sequence name="Name · B" from={156} durationInFrames={98}>
         <CircleNameplate
           name="Sam Xplains"
-          role="MPSC · इतिहास मार्गदर्शन"
-          centerX={CIRCLE.centerX}
+          role="MPSC · इतिहास"
+          centerX={NAMEPLATE_LEFT}
           top={NAMEPLATE_TOP}
+          align="left"
           exitAt={88}
         />
       </Sequence>
       <Sequence name="Name · H" from={1077} durationInFrames={93}>
         <CircleNameplate
           name="Sam Xplains"
-          role="MPSC · इतिहास मार्गदर्शन"
-          centerX={CIRCLE.centerX}
+          role="MPSC · इतिहास"
+          centerX={NAMEPLATE_LEFT}
           top={NAMEPLATE_TOP}
+          align="left"
           exitAt={83}
         />
       </Sequence>
@@ -376,10 +390,11 @@ export const MpscHistoryVideo: React.FC = () => {
         <DipToBlack />
       </Sequence>
 
-      {/* Subtitles: lower-middle, below the circle, throughout. */}
+      {/* Subtitles: middle of the screen, above the circle (lower during C). */}
       <Subtitles
         captions={MPSC_HISTORY_CAPTIONS_HOOK}
-        centerY={1560}
+        centerY={SUBTITLE_Y}
+        zones={SUBTITLE_ZONES}
         fontSize={72}
         maxWidth={960}
         highlightColor={Y}
@@ -387,7 +402,8 @@ export const MpscHistoryVideo: React.FC = () => {
       />
       <Subtitles
         captions={MPSC_HISTORY_CAPTIONS}
-        centerY={1560}
+        centerY={SUBTITLE_Y}
+        zones={SUBTITLE_ZONES}
         fontSize={72}
         maxWidth={960}
         highlightColor={Y}

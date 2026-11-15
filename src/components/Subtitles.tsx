@@ -67,9 +67,16 @@ export const parseCaption = (text: string): Word[] => {
   }, []);
 };
 
-export const Subtitles: React.FC<SubtitlesProps> = ({
+export const Subtitles: React.FC<
+  SubtitlesProps & {
+    // Optional: use a different centerY during these time ranges (e.g. while
+    // a full-screen graphic needs the subtitles somewhere else).
+    zones?: { fromMs: number; toMs: number; centerY: number }[];
+  }
+> = ({
   captions,
   centerY,
+  zones = [],
   fontSize,
   maxWidth,
   highlightColor,
@@ -99,7 +106,9 @@ export const Subtitles: React.FC<SubtitlesProps> = ({
         style={{
           position: "absolute",
           left: "50%",
-          top: centerY,
+          top:
+            zones.find((z) => nowMs >= z.fromMs && nowMs < z.toMs)?.centerY ??
+            centerY,
           width: maxWidth,
           marginLeft: -maxWidth / 2,
           translate: "0px -50%",
