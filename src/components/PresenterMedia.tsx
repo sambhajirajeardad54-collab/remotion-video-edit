@@ -5,6 +5,7 @@ import {
   useCurrentFrame,
   useVideoConfig,
 } from "remotion";
+import { assertNotReference } from "../workflow/media";
 import { SceneBackground } from "./SceneBackground";
 import { theme } from "./theme";
 
@@ -63,6 +64,8 @@ export const PresenterMedia: React.FC<{
   shiftY = 0,
   torsoFillFrom,
 }) => {
+  assertNotReference(presenterSrc, "PresenterMedia");
+  if (foregroundSrc) assertNotReference(foregroundSrc, "PresenterMedia cutout");
   const frame = useCurrentFrame();
   const { width } = useVideoConfig();
   const scale = baseZoom + zoom * Math.min(1, frame / durationInFrames);

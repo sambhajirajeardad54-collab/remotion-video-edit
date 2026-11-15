@@ -3,8 +3,11 @@ dist
 .DS_Store
 .env
 
-# Ignore the output video from Git but not videos you import into src/.
-out
+# Rendered output: never committed, except the README of out/final-video/.
+out/*
+!out/final-video/
+out/final-video/*
+!out/final-video/README.md
 
 # Output of `npm run build`
 build
@@ -14,3 +17,14 @@ build
 presenter-cutout.webm
 scripts/remove-background/modnet.onnx
 __pycache__/
+
+# Sam Xplains production folders: large videos stay local unless approved.
+# Only the README files are committed.
+public/videos/raw-video/*
+!public/videos/raw-video/README.md
+public/videos/reference-video/*
+!public/videos/reference-video/README.md
+
+# Generated files: background-removal cutouts and downloaded AI models.
+public/videos/cutouts/
+*.onnx

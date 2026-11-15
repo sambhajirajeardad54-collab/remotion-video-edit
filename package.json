@@ -30,7 +30,8 @@
     "dev": "remotion studio",
     "build": "remotion bundle",
     "upgrade": "remotion upgrade",
-    "lint": "eslint src && tsc"
+    "lint": "eslint src && tsc",
+    "render:final": "bash scripts/workflow/render-final.sh"
   },
   "allowScripts": {
     "esbuild": false
