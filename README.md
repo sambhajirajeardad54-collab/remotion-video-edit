@@ -1,4 +1,4 @@
-# Sam Xplains studio + Pragati Academy platform
+# Sam Xplains studio + लक्ष्य Academy platform
 
 This repository holds two independent projects:
 
@@ -24,11 +24,15 @@ Shortcuts from the repo root: `npm run video:install`, `npm run video:dev`, `npm
 
 ---
 
-# Pragati Academy — Student Platform
+# लक्ष्य Academy (Lakshya Academy) — Student Platform
 
 Web + Android learning platform for an independent coaching institute in Maharashtra, preparing students for **MPSC Group C**, **Group D** and **DMER** recruitment exams. Fully bilingual: **मराठी** and **English**.
 
-> "Pragati Academy" is a placeholder name. Change it in `packages/core/src/data/brand.ts` (and `apps/mobile/app.json`).
+> **ध्येय तुमचे, मार्गदर्शन आमचे!** — navy blue and gold.
+>
+> - Name and tagline: `packages/core/src/data/brand.ts`. Colours and the target-and-arrow mark: `packages/design/src/index.ts`, `packages/design/src/brand.ts`.
+> - App icon, adaptive icon, splash and favicons are generated from the mark: `node --no-warnings packages/design/scripts/generate-brand-assets.mjs` (needs Playwright/Chromium).
+> - Android package ID is configurable until final verification: set `ANDROID_PACKAGE` (default placeholder `com.lakshyaacademy.app`), or use the *android_package* input of the APK workflow. It can never change after a Play Store release.
 
 | Web (desktop, Marathi) | Android app |
 | --- | --- |
@@ -41,6 +45,7 @@ Web + Android learning platform for an independent coaching institute in Maharas
 - **Tests** — 4 practice sets (32 real, bilingual questions) with a working timer, question palette, auto-submit, negative marking, scored results and answer review with explanations. Scheduled full mocks are listed but locked.
 - **Study material** — notes, previous papers, current affairs, formula sheets with key points.
 - **Profile** — change target exam and language, see progress, reset.
+- **Login / registration previews** — branded screens with mobile-number validation; design only, nothing is saved or sent until accounts launch.
 - **Marathi ⇄ English** everywhere, remembered between visits.
 - Progress is saved **on the device** (browser storage / Android AsyncStorage).
 
