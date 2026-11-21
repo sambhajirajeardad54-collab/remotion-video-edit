@@ -67,8 +67,8 @@ You don't need a computer:
 
 1. **Make changes** in a Claude Code cloud session (claude.ai/code) on this repo, or edit files in the GitHub app.
 2. **Check it works**: every push runs the **CI** workflow (GitHub app → *Actions*) with two independent jobs:
-   - **video** — installs `apps/video` on its own, checks React 19.3.1, lints/typechecks, confirms all 15 compositions exist, renders a still of each and a short MpscHistory clip with audio.
-   - **check** — typechecks, runs unit tests, builds the website, bundles the Android app and clicks through both apps in a headless browser.
+   - **video** — installs `apps/video` on its own, checks React 19.3.1, lints/typechecks, confirms all 15 compositions exist, warns if a branch changes any file under `apps/video`, renders a still of each and a short MpscHistory clip with audio.
+   - **check** — lints, typechecks, runs unit tests, builds the website, bundles the Android app and clicks through both apps in a headless browser.
    Screenshots/stills are attached to each run as artifacts.
 3. **Install on your phone** *(optional, one-time setup)*: create a free account at expo.dev → *Access tokens* → create a token → add it to this repo as the secret `EXPO_TOKEN` (*Settings → Secrets and variables → Actions*). Then run *Actions → Android APK → Run workflow*. Expo builds an `.apk` and shows a download link on expo.dev.
 
@@ -82,6 +82,7 @@ npm install            # installs the platform workspaces (not apps/video)
 npm run dev:web        # website on http://localhost:3000
 npm run dev:mobile     # Expo dev server (scan the QR code with Expo Go)
 
+npm run lint           # ESLint (Next.js, Expo and shared-package rules)
 npm run typecheck      # all workspaces
 npm test               # unit tests for shared logic and content
 npm run build:web      # production web build

@@ -9,7 +9,8 @@
     "web": "expo start --web",
     "typecheck": "tsc --noEmit",
     "export:android": "expo export --platform android --output-dir dist/android",
-    "export:web": "expo export --platform web --output-dir dist/web"
+    "export:web": "expo export --platform web --output-dir dist/web",
+    "lint": "eslint ."
   },
   "dependencies": {
     "@edu/core": "*",
@@ -33,6 +34,7 @@
   },
   "devDependencies": {
     "@types/react": "~19.3.0",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "eslint-config-expo": "~58.0.4"
   }
 }

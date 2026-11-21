@@ -16,16 +16,18 @@
     "dev:web": "npm run dev -w @edu/web",
     "dev:mobile": "npm run start -w @edu/mobile",
     "typecheck": "npm run typecheck --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
     "build:web": "npm run build -w @edu/web",
     "export:android": "npm run export:android -w @edu/mobile",
-    "check": "npm run typecheck && npm run test && npm run build:web && npm run export:android",
+    "check": "npm run lint && npm run typecheck && npm run test && npm run build:web && npm run export:android",
     "video:install": "npm ci --prefix apps/video",
     "video:dev": "npm run dev --prefix apps/video",
     "video:lint": "npm run lint --prefix apps/video",
     "video:render": "npm run render:final --prefix apps/video --"
   },
   "devDependencies": {
+    "eslint": "9.39.5",
     "typescript": "5.9.3"
   }
 }
