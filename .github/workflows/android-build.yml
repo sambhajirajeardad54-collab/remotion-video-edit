@@ -1,0 +1,109 @@
+# Lakshya Academy Android builds on Expo's build servers (EAS).
+#
+# One-time setup: create an account at expo.dev → Access tokens → create a token,
+# and add it to this repo as the Actions secret EXPO_TOKEN.
+#
+# Run from the GitHub app: Actions → "Android build" → Run workflow, then choose:
+#   check-only            verify EXPO_TOKEN and the build configuration (no build)  ← default
+#   production-apk        signed production APK for installing on test phones
+#   production-aab        signed Android App Bundle for Google Play
+#   production-apk-and-aab  both
+#   preview-apk           quick internal test build
+# Builds run on EAS; download links appear on expo.dev (Projects → lakshya-academy → Builds).
+# The first build creates the app's signing key on EAS automatically — back it up
+# afterwards (expo.dev → project → Credentials → Android → Download keystore).
+name: Android build
+
+on:
+  workflow_dispatch:
+    inputs:
+      build:
+        description: What to do
+        type: choice
+        default: check-only
+        options:
+          - check-only
+          - production-apk
+          - production-aab
+          - production-apk-and-aab
+          - preview-apk
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-build
+  cancel-in-progress: false
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: apps/mobile
+    env:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+      EAS: npx --yes eas-cli@27.11.0
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+        working-directory: .
+
+      - name: EXPO_TOKEN is configured and valid (value never printed)
+        run: |
+          if [ -z "$EXPO_TOKEN" ]; then
+            echo "::error title=EXPO_TOKEN missing::Add the EXPO_TOKEN repository secret (Settings → Secrets and variables → Actions)."
+            exit 1
+          fi
+          echo "EXPO_TOKEN is set (${#EXPO_TOKEN} characters)."
+          $EAS whoami || { echo "::error title=EXPO_TOKEN invalid::Expo rejected the token. Create a new one at expo.dev and update the secret."; exit 1; }
+
+      - name: Build configuration
+        run: |
+          npx expo config --type public --json | node -e '
+            const c = JSON.parse(require("fs").readFileSync(0));
+            const ok = c.android?.package === "com.lakshyaacademy.app" && c.name === "Lakshya Academy";
+            console.log(`name=${c.name} package=${c.android?.package} version=${c.version}`);
+            if (!ok) { console.error("::error::Unexpected app name or Android package ID"); process.exit(1); }'
+          npx expo install --check
+          $EAS config --platform android --profile production --non-interactive > /dev/null
+          echo "eas.json production profile resolves."
+
+      - name: Production builds run only from main
+        if: inputs.build != 'check-only' && inputs.build != 'preview-apk' && github.ref != 'refs/heads/main'
+        run: |
+          echo "::error::Run production builds from the main branch."
+          exit 1
+
+      - name: Link the EAS project
+        if: inputs.build != 'check-only'
+        run: $EAS init --non-interactive --force
+
+      - name: Production APK (device testing)
+        if: inputs.build == 'production-apk' || inputs.build == 'production-apk-and-aab'
+        run: $EAS build --platform android --profile production-apk --non-interactive --no-wait
+
+      - name: Production AAB (Google Play)
+        if: inputs.build == 'production-aab' || inputs.build == 'production-apk-and-aab'
+        run: $EAS build --platform android --profile production --non-interactive --no-wait
+
+      - name: Preview APK
+        if: inputs.build == 'preview-apk'
+        run: $EAS build --platform android --profile preview --non-interactive --no-wait
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "### Android build: \`${{ inputs.build }}\`"
+            if [ "${{ inputs.build }}" = "check-only" ]; then
+              echo "Token and configuration verified. No build was started."
+            else
+              echo "Build(s) queued on EAS. Download from expo.dev → Projects → lakshya-academy → Builds."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

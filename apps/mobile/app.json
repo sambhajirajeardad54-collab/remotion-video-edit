@@ -10,11 +10,17 @@
     "backgroundColor": "#F3F6FC",
     "primaryColor": "#0A1A3F",
     "android": {
+      "package": "com.lakshyaacademy.app",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "monochromeImage": "./assets/images/adaptive-monochrome.png",
         "backgroundColor": "#0A1A3F"
-      }
+      },
+      "blockedPermissions": [
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.SYSTEM_ALERT_WINDOW"
+      ]
     },
     "web": {
       "output": "single",

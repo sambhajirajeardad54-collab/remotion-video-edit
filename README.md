@@ -32,7 +32,7 @@ Web + Android learning platform for an independent coaching institute in Maharas
 >
 > - Name and tagline: `packages/core/src/data/brand.ts`. Colours and the target-and-arrow mark: `packages/design/src/index.ts`, `packages/design/src/brand.ts`.
 > - App icon, adaptive icon, splash and favicons are generated from the mark: `node --no-warnings packages/design/scripts/generate-brand-assets.mjs` (needs Playwright/Chromium).
-> - Android package ID is configurable until final verification: set `ANDROID_PACKAGE` (default placeholder `com.lakshyaacademy.app`), or use the *android_package* input of the APK workflow. It can never change after a Play Store release.
+> - Android package ID (permanent): **`com.lakshyaacademy.app`**, set in `apps/mobile/app.json`. It can never change after a Play Store release.
 
 | Web (desktop, Marathi) | Android app |
 | --- | --- |
@@ -75,7 +75,15 @@ You don't need a computer:
    - **video** — installs `apps/video` on its own, checks React 19.3.1, lints/typechecks, confirms all 15 compositions exist, warns if a branch changes any file under `apps/video`, renders a still of each and a short MpscHistory clip with audio.
    - **check** — lints, typechecks, runs unit tests, builds the website, bundles the Android app and clicks through both apps in a headless browser.
    Screenshots/stills are attached to each run as artifacts.
-3. **Install on your phone** *(optional, one-time setup)*: create a free account at expo.dev → *Access tokens* → create a token → add it to this repo as the secret `EXPO_TOKEN` (*Settings → Secrets and variables → Actions*). Then run *Actions → Android APK → Run workflow*. Expo builds an `.apk` and shows a download link on expo.dev.
+3. **Build the Android app** *(one-time setup)*: create an account at expo.dev → *Access tokens* → create a token → add it to this repo as the Actions secret `EXPO_TOKEN` (*Settings → Secrets and variables → Actions*). Then *Actions → Android build → Run workflow* and choose:
+   - `check-only` (default): verifies the token and build configuration; starts no build.
+   - `production-apk`: signed APK to install on test phones.
+   - `production-aab`: signed Android App Bundle for Google Play.
+   - `production-apk-and-aab`: both. (`preview-apk`: quick internal build.)
+
+   Builds run on Expo's servers (EAS); download them from expo.dev → *Projects → lakshya-academy → Builds*. Production builds run only from `main`. Version codes are managed by EAS and increase with every production build.
+
+   **Signing:** the first production build creates the app's signing key on EAS. Download a backup straight away (expo.dev → project → *Credentials → Android → Download keystore*) and keep it somewhere safe and private — never in this repository.
 
 ## Commands (for a cloud session or computer)
 
@@ -109,4 +117,4 @@ BASE_URL=http://localhost:8090 node e2e/smoke.mjs
 
 ## Secrets
 
-None are needed to build or run the apps. Never commit `.env` files, keystores or tokens; they are git-ignored. The only optional secret is `EXPO_TOKEN`, stored in GitHub Actions secrets, for APK builds.
+None are needed to build or run the apps. Never commit `.env` files, keystores or tokens; they are git-ignored. The only secret is `EXPO_TOKEN`, stored in GitHub Actions secrets, for Android builds. The Android signing key lives on EAS (managed credentials), not in the repository.
