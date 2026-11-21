@@ -1,0 +1,27 @@
+{
+  "expo": {
+    "name": "Pragati Academy",
+    "slug": "pragati-academy",
+    "scheme": "pragati",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "backgroundColor": "#F3F6FC",
+    "primaryColor": "#10265A",
+    "android": {
+      "package": "in.pragatiacademy.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#10265A"
+      },
+      "edgeToEdgeEnabled": true
+    },
+    "web": {
+      "output": "single",
+      "bundler": "metro"
+    },
+    "plugins": ["expo-router"],
+    "experiments": {
+      "typedRoutes": false
+    }
+  }
+}

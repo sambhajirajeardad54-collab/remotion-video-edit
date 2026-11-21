@@ -1,10 +1,31 @@
 node_modules
 dist
-.DS_Store
-.env
-
-# Ignore the output video from Git but not videos you import into src/.
-out
-
-# Output of `npm run build`
 build
+out
+.DS_Store
+coverage
+
+# Secrets — never commit
+.env
+.env.*
+!.env.example
+*.pem
+*.keystore
+*.jks
+
+# Next.js
+apps/web/.next
+apps/web/next-env.d.ts
+*.tsbuildinfo
+
+# Expo / React Native
+apps/mobile/.expo
+apps/mobile/dist
+apps/mobile/android
+apps/mobile/ios
+apps/mobile/web-build
+
+# Test artefacts
+test-results
+playwright-report
+/screenshots

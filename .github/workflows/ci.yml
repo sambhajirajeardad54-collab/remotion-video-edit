@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      NEXT_TELEMETRY_DISABLED: 1
+      EXPO_NO_TELEMETRY: 1
+      EXPO_OFFLINE: 1
+      CI: 1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+
+      - name: Typecheck all workspaces
+        run: npm run typecheck
+      - name: Unit tests (shared core)
+        run: npm test
+
+      - name: Build web (Next.js)
+        run: npm run build:web
+      - name: Bundle Android app (Metro/Hermes)
+        run: npm run export:android
+      - name: Export mobile app for web preview
+        run: npm run export:web -w @edu/mobile
+
+      - name: Install Playwright Chromium
+        run: npm install --no-save --no-audit --no-fund playwright@1.63.0 && npx playwright install --with-deps chromium
+      - name: Web end-to-end smoke test
+        run: |
+          (cd apps/web && npx next start -p 3100 &) && npx wait-on@8.0.3 http://localhost:3100 --timeout 60000
+          BASE_URL=http://localhost:3100 SCREENSHOT_DIR=../../screenshots node apps/web/e2e/smoke.mjs
+      - name: Mobile end-to-end smoke test
+        working-directory: apps/mobile
+        run: |
+          (node e2e/serve.mjs dist/web 8090 &) && sleep 1
+          BASE_URL=http://localhost:8090 SCREENSHOT_DIR=../../screenshots node e2e/smoke.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: screenshots
+          path: screenshots
+          if-no-files-found: ignore

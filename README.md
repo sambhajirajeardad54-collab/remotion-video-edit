@@ -1,54 +1,78 @@
-# Remotion video
+# Pragati Academy — Student Platform
 
-<p align="center">
-  <a href="https://github.com/remotion-dev/logo">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://github.com/remotion-dev/logo/raw/main/animated-logo-banner-dark.apng">
-      <img alt="Animated Remotion Logo" src="https://github.com/remotion-dev/logo/raw/main/animated-logo-banner-light.gif">
-    </picture>
-  </a>
-</p>
+Web + Android learning platform for an independent coaching institute in Maharashtra, preparing students for **MPSC Group C**, **Group D** and **DMER** recruitment exams. Fully bilingual: **मराठी** and **English**.
 
-Welcome to your Remotion project!
+> "Pragati Academy" is a placeholder name. Change it in `packages/core/src/data/brand.ts` (and `apps/mobile/app.json`).
 
-## Commands
+| Web (desktop, Marathi) | Android app |
+| --- | --- |
+| ![Dashboard](docs/screenshots/desktop-dashboard-mr.png) | ![Mobile dashboard](docs/screenshots/mobile-dashboard-mr.png) |
 
-**Install Dependencies**
+## What works today (milestone 1)
 
-```console
-npm i --loglevel=error
+- **Student dashboard** — greeting, target-exam switcher, study streak, "up next" lesson, stats, enrolled-course progress, practice tests, upcoming scheduled tests, announcements, exam pattern, recommendations.
+- **Courses** — 7 realistic courses (filter by exam), course detail with syllabus; students mark lessons done and progress updates everywhere.
+- **Tests** — 4 practice sets (32 real, bilingual questions) with a working timer, question palette, auto-submit, negative marking, scored results and answer review with explanations. Scheduled full mocks are listed but locked.
+- **Study material** — notes, previous papers, current affairs, formula sheets with key points.
+- **Profile** — change target exam and language, see progress, reset.
+- **Marathi ⇄ English** everywhere, remembered between visits.
+- Progress is saved **on the device** (browser storage / Android AsyncStorage).
+
+**Not in this milestone (by design):** payments, database, login/accounts, video playback, PDF downloads. Buttons for these say "coming soon".
+
+## Repository layout
+
+```
+apps/
+  web/        Next.js 16 website (App Router, TypeScript)
+  mobile/     Expo SDK 58 Android app (expo-router, TypeScript)
+  video/      Remotion promo-video project (pre-existing)
+packages/
+  core/       Shared types, sample data, Marathi/English text, business logic, React state + test engine
+  design/     Shared design tokens: navy / white / saffron palette, type scale, spacing
+docs/         Architecture notes and screenshots
 ```
 
-**Start Preview**
+See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the design decisions.
 
-```console
-npm run dev
+## Working from an Android phone
+
+You don't need a computer:
+
+1. **Make changes** in a Claude Code cloud session (claude.ai/code) on this repo, or edit files in the GitHub app.
+2. **Check it works**: every push runs the **CI** workflow (GitHub app → *Actions*). It typechecks, runs unit tests, builds the website, bundles the Android app and clicks through both apps in a headless browser. Screenshots are attached to each run as an artifact.
+3. **Install on your phone** *(optional, one-time setup)*: create a free account at expo.dev → *Access tokens* → create a token → add it to this repo as the secret `EXPO_TOKEN` (*Settings → Secrets and variables → Actions*). Then run *Actions → Android APK → Run workflow*. Expo builds an `.apk` and shows a download link on expo.dev.
+
+## Commands (for a cloud session or computer)
+
+Requires Node 20.19+ (22 recommended).
+
+```bash
+npm install            # installs all workspaces
+
+npm run dev:web        # website on http://localhost:3000
+npm run dev:mobile     # Expo dev server (scan the QR code with Expo Go)
+npm run dev:video      # Remotion studio
+
+npm run typecheck      # all workspaces
+npm test               # unit tests for shared logic and content
+npm run build:web      # production web build
+npm run export:android # compile the Android JS bundle (proves the app builds)
+npm run check          # all of the above
 ```
 
-**Render video**
+End-to-end smoke tests (need the preinstalled Playwright/Chromium):
 
-```console
-npx remotion render
+```bash
+# web
+npm run build:web && (cd apps/web && npx next start -p 3100 &)
+BASE_URL=http://localhost:3100 node apps/web/e2e/smoke.mjs
+
+# mobile (runs the Expo app through react-native-web at phone size)
+cd apps/mobile && npm run export:web && (node e2e/serve.mjs dist/web 8090 &)
+BASE_URL=http://localhost:8090 node e2e/smoke.mjs
 ```
 
-**Upgrade Remotion**
+## Secrets
 
-```console
-npx remotion upgrade
-```
-
-## Docs
-
-Get started with Remotion by reading the [fundamentals page](https://www.remotion.dev/docs/the-fundamentals).
-
-## Help
-
-We provide help on our [Discord server](https://discord.gg/6VzzNDwUwV).
-
-## Issues
-
-Found an issue with Remotion? [File an issue here](https://github.com/remotion-dev/remotion/issues/new).
-
-## License
-
-Note that for some entities a company license is needed. [Read the terms here](https://github.com/remotion-dev/remotion/blob/main/LICENSE.md).
+None are needed to build or run the apps. Never commit `.env` files, keystores or tokens; they are git-ignored. The only optional secret is `EXPO_TOKEN`, stored in GitHub Actions secrets, for APK builds.
