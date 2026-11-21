@@ -29,7 +29,7 @@ jobs:
       run:
         working-directory: apps/video
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Guard — report any change to the video studio
@@ -44,7 +44,7 @@ jobs:
             echo "::warning title=Video studio changed::$(echo "$changed" | wc -l) file(s) under apps/video differ from main — confirm this was intended."
             { echo "### ⚠️ Files under apps/video changed compared with main"; echo '```'; echo "$changed"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
           fi
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
@@ -76,7 +76,7 @@ jobs:
             --pixel-format=yuv420p --image-format=jpeg --jpeg-quality=95 --audio-codec=aac --audio-bitrate=320k
           npx remotion ffprobe -v error -show_entries stream=codec_name,width,height -of compact out/ci-mpsc.mp4 | tee /tmp/probe.txt
           grep -q "codec_name=h264|width=1080|height=1920" /tmp/probe.txt && grep -q "codec_name=aac" /tmp/probe.txt
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: video-stills
@@ -96,8 +96,8 @@ jobs:
       EXPO_OFFLINE: 1
       CI: 1
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
@@ -128,7 +128,7 @@ jobs:
         run: |
           (node e2e/serve.mjs dist/web 8090 &) && sleep 1
           BASE_URL=http://localhost:8090 SCREENSHOT_DIR=../../screenshots node e2e/smoke.mjs
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: screenshots
