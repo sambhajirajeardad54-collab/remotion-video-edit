@@ -1,4 +1,4 @@
-import { APP_VERSION, brand, buildDashboard, exams, formatDate, sampleStudent, type ExamId, type Locale } from '@edu/core';
+import { APP_VERSION, brand, buildDashboard, exams, formatDate, parseDayKey, sampleStudent, type ExamId, type Locale } from '@edu/core';
 import { useStudent } from '@edu/core/react';
 import { colors, radii, spacing } from '@edu/design';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -37,7 +37,7 @@ export default function ProfileScreen() {
             </T>
           </Row>
           <T variant="small">
-            {m.profile.memberSince}: {formatDate(new Date(sampleStudent.memberSince), locale)}
+            {m.profile.memberSince}: {formatDate(parseDayKey(sampleStudent.memberSince), locale)}
           </T>
         </View>
       </Card>

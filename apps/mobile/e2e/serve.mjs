@@ -18,4 +18,4 @@ createServer(async (req, res) => {
     res.writeHead(200, { 'content-type': 'text/html' });
     res.end(await readFile(path.join(root, 'index.html')));
   }
-}).listen(port, () => console.log(`serving ${root} on :${port}`));
+}).listen(port, '127.0.0.1', () => console.log(`serving ${root} on :${port}`));

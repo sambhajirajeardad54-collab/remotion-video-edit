@@ -43,13 +43,16 @@ export function useTestSession(test: MockTest | undefined, onSubmit: (attempt: T
   answersRef.current = answers;
   const onSubmitRef = useRef(onSubmit);
   onSubmitRef.current = onSubmit;
+  /** Guards against recording one attempt twice (e.g. tap on Submit as the timer hits zero). */
+  const submittedRef = useRef(false);
 
   const secondsLeft =
     phase === 'running' && startedAt !== null ? Math.max(0, Math.ceil(durationSec - (now - startedAt) / 1000)) : durationSec;
 
   const finish = useCallback(
     (byTimer: boolean) => {
-      if (!test || startedAt === null) return;
+      if (!test || startedAt === null || submittedRef.current) return;
+      submittedRef.current = true;
       setPhase('finished');
       setTimedOut(byTimer);
       onSubmitRef.current({
@@ -91,6 +94,7 @@ export function useTestSession(test: MockTest | undefined, onSubmit: (attempt: T
       setStartedAt(t);
       setNow(t);
       setTimedOut(false);
+      submittedRef.current = false;
       setPhase('running');
     },
     choose: (option) =>

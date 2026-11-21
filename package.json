@@ -5,7 +5,7 @@
   "description": "Coaching institute platform (web + Android) and the Sam Xplains Remotion video studio, in one repository.",
   "license": "UNLICENSED",
   "engines": {
-    "node": "^20.19.0 || ^22.13.0 || >=24"
+    "node": "^22.12.0 || >=24"
   },
   "workspaces": [
     "apps/web",
@@ -20,7 +20,6 @@
     "build:web": "npm run build -w @edu/web",
     "export:android": "npm run export:android -w @edu/mobile",
     "check": "npm run typecheck && npm run test && npm run build:web && npm run export:android",
-
     "video:install": "npm ci --prefix apps/video",
     "video:dev": "npm run dev --prefix apps/video",
     "video:lint": "npm run lint --prefix apps/video",

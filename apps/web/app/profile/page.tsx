@@ -1,6 +1,6 @@
 'use client';
 
-import { APP_VERSION, brand, buildDashboard, exams, formatDate, sampleStudent, type ExamId, type Locale } from '@edu/core';
+import { APP_VERSION, brand, buildDashboard, exams, formatDate, parseDayKey, sampleStudent, type ExamId, type Locale } from '@edu/core';
 import { useStudent } from '@edu/core/react';
 import { useMemo } from 'react';
 import { Card, Chips, PageHeader, StatTile, WhenReady } from '@/components/ui';
@@ -35,7 +35,7 @@ function Profile() {
             <MapPin size={14} aria-hidden /> {m.profile.district}: {L(sampleStudent.district)}
           </span>
           <span className="muted small">
-            {m.profile.memberSince}: {formatDate(new Date(sampleStudent.memberSince), locale)}
+            {m.profile.memberSince}: {formatDate(parseDayKey(sampleStudent.memberSince), locale)}
           </span>
         </div>
       </Card>

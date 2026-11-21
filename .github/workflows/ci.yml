@@ -6,9 +6,15 @@ on:
   pull_request:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
+
+# Same-repo PR commits are already checked by the push run (its results show
+# on the PR), so pull_request runs only for forks. This halves CI minutes.
 
 jobs:
   # ---------------------------------------------------------------------------
@@ -16,6 +22,7 @@ jobs:
   # lockfile (React 19.3.1); never shares node_modules with the platform.
   # ---------------------------------------------------------------------------
   video:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
     runs-on: ubuntu-latest
     timeout-minutes: 30
     defaults:
@@ -66,6 +73,7 @@ jobs:
   # Educational platform (web + Android + shared packages)
   # ---------------------------------------------------------------------------
   check:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
     runs-on: ubuntu-latest
     timeout-minutes: 25
     env:

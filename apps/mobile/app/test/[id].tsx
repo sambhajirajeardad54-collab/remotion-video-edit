@@ -18,7 +18,7 @@ export default function TestScreen() {
       </Screen>
     );
   }
-  return <Runner test={test} />;
+  return <Runner key={test.id} test={test} />;
 }
 
 function Runner({ test }: { test: MockTest }) {

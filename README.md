@@ -74,7 +74,7 @@ You don't need a computer:
 
 ## Commands (for a cloud session or computer)
 
-Requires Node 20.19+ (22 recommended).
+Requires Node 22.12+ for the platform (the video studio keeps its own requirement in `apps/video/package.json`).
 
 ```bash
 npm install            # installs the platform workspaces (not apps/video)

@@ -22,7 +22,7 @@ function TestLoader() {
   const test = getMockTest(id);
   if (!test) return <EmptyState>{m.tests.notFound}</EmptyState>;
   if (test.status !== 'available') return <EmptyState>{m.tests.locked}</EmptyState>;
-  return <TestRunner test={test} />;
+  return <TestRunner key={test.id} test={test} />;
 }
 
 function TestRunner({ test }: { test: MockTest }) {

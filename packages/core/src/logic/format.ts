@@ -62,6 +62,12 @@ export function toDayKey(date: Date): string {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 }
 
+/** Parse "YYYY-MM-DD" as a local calendar date (new Date("YYYY-MM-DD") is UTC and can shift a day). */
+export function parseDayKey(key: string): Date {
+  const [y = 1970, m = 1, d = 1] = key.split('-').map(Number);
+  return new Date(y, m - 1, d);
+}
+
 export function addDays(date: Date, days: number): Date {
   const d = new Date(date);
   d.setDate(d.getDate() + days);
