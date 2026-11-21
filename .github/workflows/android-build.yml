@@ -1,32 +1,31 @@
 # Lakshya Academy Android builds on Expo's build servers (EAS).
 #
-# One-time setup: create an account at expo.dev → Access tokens → create a token,
-# and add it to this repo as the Actions secret EXPO_TOKEN.
+# Needs the repository secret EXPO_TOKEN (Settings → Secrets and variables →
+# Actions). Create the token at expo.dev → Account settings → Access tokens.
 #
-# Run from the GitHub app: Actions → "Android build" → Run workflow, then choose:
-#   check-only            verify EXPO_TOKEN and the build configuration (no build)  ← default
-#   production-apk        signed production APK for installing on test phones
-#   production-aab        signed Android App Bundle for Google Play
-#   production-apk-and-aab  both
-#   preview-apk           quick internal test build
-# Builds run on EAS; download links appear on expo.dev (Projects → lakshya-academy → Builds).
-# The first build creates the app's signing key on EAS automatically — back it up
-# afterwards (expo.dev → project → Credentials → Android → Download keystore).
+# Run from GitHub: Actions → "Android build" → Run workflow, then choose:
+#   preview-apk             installable test APK            ← default
+#   production-apk          signed production APK for test phones
+#   production-aab          signed Android App Bundle for Google Play
+#   production-apk-and-aab  both production files
+# The workflow waits for EAS to finish and attaches the .apk/.aab to the run
+# (scroll to "Artifacts" on the run page). Builds are also listed on expo.dev.
+# The first build creates the app's signing key on EAS — back it up afterwards
+# (expo.dev → project → Credentials → Android → Download keystore).
 name: Android build
 
 on:
   workflow_dispatch:
     inputs:
       build:
-        description: What to do
+        description: What to build
         type: choice
-        default: check-only
+        default: preview-apk
         options:
-          - check-only
+          - preview-apk
           - production-apk
           - production-aab
           - production-apk-and-aab
-          - preview-apk
 
 permissions:
   contents: read
@@ -38,13 +37,15 @@ concurrency:
 jobs:
   android:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    # EAS free-tier builds can wait in a queue before they start.
+    timeout-minutes: 120
     defaults:
       run:
         working-directory: apps/mobile
     env:
       EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
       EAS: npx --yes eas-cli@27.11.0
+      OUT: ${{ github.workspace }}/android-builds
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -57,53 +58,59 @@ jobs:
       - name: EXPO_TOKEN is configured and valid (value never printed)
         run: |
           if [ -z "$EXPO_TOKEN" ]; then
-            echo "::error title=EXPO_TOKEN missing::Add the EXPO_TOKEN repository secret (Settings → Secrets and variables → Actions)."
+            echo "::error title=EXPO_TOKEN missing::The repository secret EXPO_TOKEN is not set. Expo cannot build without it. Add it under Settings → Secrets and variables → Actions → New repository secret."
             exit 1
           fi
-          echo "EXPO_TOKEN is set (${#EXPO_TOKEN} characters)."
           $EAS whoami || { echo "::error title=EXPO_TOKEN invalid::Expo rejected the token. Create a new one at expo.dev and update the secret."; exit 1; }
 
       - name: Build configuration
         run: |
           npx expo config --type public --json | node -e '
             const c = JSON.parse(require("fs").readFileSync(0));
-            const ok = c.android?.package === "com.lakshyaacademy.app" && c.name === "Lakshya Academy";
             console.log(`name=${c.name} package=${c.android?.package} version=${c.version}`);
-            if (!ok) { console.error("::error::Unexpected app name or Android package ID"); process.exit(1); }'
-          npx expo install --check
-          $EAS config --platform android --profile production --non-interactive > /dev/null
-          echo "eas.json production profile resolves."
+            if (c.android?.package !== "com.lakshyaacademy.app" || c.name !== "Lakshya Academy") {
+              console.error("::error::Unexpected app name or Android package ID"); process.exit(1);
+            }'
 
       - name: Production builds run only from main
-        if: inputs.build != 'check-only' && inputs.build != 'preview-apk' && github.ref != 'refs/heads/main'
+        if: startsWith(inputs.build, 'production') && github.ref != 'refs/heads/main'
         run: |
           echo "::error::Run production builds from the main branch."
           exit 1
 
       - name: Link the EAS project
-        if: inputs.build != 'check-only'
         run: $EAS init --non-interactive --force
 
-      - name: Production APK (device testing)
-        if: inputs.build == 'production-apk' || inputs.build == 'production-apk-and-aab'
-        run: $EAS build --platform android --profile production-apk --non-interactive --no-wait
-
-      - name: Production AAB (Google Play)
-        if: inputs.build == 'production-aab' || inputs.build == 'production-apk-and-aab'
-        run: $EAS build --platform android --profile production --non-interactive --no-wait
-
-      - name: Preview APK
-        if: inputs.build == 'preview-apk'
-        run: $EAS build --platform android --profile preview --non-interactive --no-wait
-
-      - name: Summary
-        if: always()
+      - name: Build on EAS and download
         run: |
-          {
-            echo "### Android build: \`${{ inputs.build }}\`"
-            if [ "${{ inputs.build }}" = "check-only" ]; then
-              echo "Token and configuration verified. No build was started."
-            else
-              echo "Build(s) queued on EAS. Download from expo.dev → Projects → lakshya-academy → Builds."
-            fi
-          } >> "$GITHUB_STEP_SUMMARY"
+          mkdir -p "$OUT"
+          build() { # $1 = eas.json profile, $2 = output file name
+            echo "::group::EAS build: profile $1"
+            $EAS build --platform android --profile "$1" --non-interactive --wait --json > "$RUNNER_TEMP/$1.json"
+            echo "::endgroup::"
+            url=$(node -e 'const b = JSON.parse(require("fs").readFileSync(process.argv[1]))[0];
+              if (b.status !== "FINISHED" || !b.artifacts?.buildUrl) { console.error("Build " + b.id + " ended with status " + b.status); process.exit(1); }
+              console.log(b.artifacts.buildUrl)' "$RUNNER_TEMP/$1.json")
+            curl -fsSL --retry 3 -o "$OUT/$2" "$url"
+            echo "Downloaded $2 ($(du -h "$OUT/$2" | cut -f1))"
+            echo "- \`$2\` (EAS profile \`$1\`)" >> "$GITHUB_STEP_SUMMARY"
+          }
+          echo "### Android build: \`${{ inputs.build }}\`" >> "$GITHUB_STEP_SUMMARY"
+          case "${{ inputs.build }}" in
+            preview-apk)            build preview        lakshya-academy-preview.apk ;;
+            production-apk)         build production-apk lakshya-academy-production.apk ;;
+            production-aab)         build production     lakshya-academy-production.aab ;;
+            production-apk-and-aab) build production-apk lakshya-academy-production.apk
+                                    build production     lakshya-academy-production.aab ;;
+          esac
+          echo "Download from the **Artifacts** section of this run, or from expo.dev → Projects → lakshya-academy → Builds." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Attach the APK/AAB to this run
+        # Also runs if a later build failed, so files that did build are kept.
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: lakshya-academy-${{ inputs.build }}
+          path: android-builds/
+          if-no-files-found: warn
+          retention-days: 30

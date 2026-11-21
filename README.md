@@ -76,12 +76,12 @@ You don't need a computer:
    - **check** — lints, typechecks, runs unit tests, builds the website, bundles the Android app and clicks through both apps in a headless browser.
    Screenshots/stills are attached to each run as artifacts.
 3. **Build the Android app** *(one-time setup)*: create an account at expo.dev → *Access tokens* → create a token → add it to this repo as the Actions secret `EXPO_TOKEN` (*Settings → Secrets and variables → Actions*). Then *Actions → Android build → Run workflow* and choose:
-   - `check-only` (default): verifies the token and build configuration; starts no build.
-   - `production-apk`: signed APK to install on test phones.
+   - `preview-apk` (default): installable test APK.
+   - `production-apk`: signed production APK to install on test phones.
    - `production-aab`: signed Android App Bundle for Google Play.
-   - `production-apk-and-aab`: both. (`preview-apk`: quick internal build.)
+   - `production-apk-and-aab`: both production files.
 
-   Builds run on Expo's servers (EAS); download them from expo.dev → *Projects → lakshya-academy → Builds*. Production builds run only from `main`. Version codes are managed by EAS and increase with every production build.
+   Builds run on Expo's servers (EAS). The workflow waits for them and attaches the `.apk`/`.aab` to the run: open the finished run and scroll to **Artifacts** (GitHub delivers it as a `.zip`; unzip to get the file). Builds are also listed on expo.dev → *Projects → lakshya-academy → Builds*. Production builds run only from `main`. Version codes are managed by EAS and increase with every production build.
 
    **Signing:** the first production build creates the app's signing key on EAS. Download a backup straight away (expo.dev → project → *Credentials → Android → Download keystore*) and keep it somewhere safe and private — never in this repository.
 
