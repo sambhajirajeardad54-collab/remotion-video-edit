@@ -1,30 +1,38 @@
-node_modules
-dist
+# Root rules for the platform workspaces only.
+# The Remotion video project keeps its own rules in apps/video/.gitignore
+# (unchanged from before the monorepo); rules here are anchored so they
+# never reach into apps/video.
+
+node_modules/
 .DS_Store
+*.tsbuildinfo
+/coverage/
+
+# Secrets — never commit
 .env
+.env.*
+!.env.example
+*.pem
+*.keystore
+*.jks
 
-# Rendered output: never committed, except the README of out/final-video/.
-out/*
-!out/final-video/
-out/final-video/*
-!out/final-video/README.md
+# Shared packages
+/packages/*/dist/
 
-# Output of `npm run build`
-build
+# Next.js
+/apps/web/.next/
+/apps/web/out/
+/apps/web/next-env.d.ts
 
-# Generated presenter cutouts (recreate with scripts/remove-background)
-*.cutout.webm
-presenter-cutout.webm
-scripts/remove-background/modnet.onnx
-__pycache__/
+# Expo / React Native
+/apps/mobile/.expo/
+/apps/mobile/dist/
+/apps/mobile/android/
+/apps/mobile/ios/
+/apps/mobile/web-build/
+/apps/mobile/expo-env.d.ts
 
-# Sam Xplains production folders: large videos stay local unless approved.
-# Only the README files are committed.
-public/videos/raw-video/*
-!public/videos/raw-video/README.md
-public/videos/reference-video/*
-!public/videos/reference-video/README.md
-
-# Generated files: background-removal cutouts and downloaded AI models.
-public/videos/cutouts/
-*.onnx
+# Test artefacts
+test-results/
+playwright-report/
+/screenshots/

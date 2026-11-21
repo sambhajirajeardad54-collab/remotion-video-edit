@@ -1,0 +1,120 @@
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+# Same-repo PR commits are already checked by the push run (its results show
+# on the PR), so pull_request runs only for forks. This halves CI minutes.
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Sam Xplains video studio (apps/video). Separate install from its own
+  # lockfile (React 19.3.1); never shares node_modules with the platform.
+  # ---------------------------------------------------------------------------
+  video:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: apps/video
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: apps/video/package-lock.json
+      - name: Install (isolated, from apps/video/package-lock.json)
+        run: npm ci --no-audit --no-fund
+      - name: React 19.3.1 is the copy Remotion uses
+        run: |
+          node -e 'const v=require(require.resolve("react/package.json",{paths:[require("path").dirname(require.resolve("remotion"))]})).version; console.log("react", v); if (v !== "19.3.1") process.exit(1)'
+      - name: Lint + typecheck (npm run lint)
+        run: npm run lint
+      - name: All compositions present
+        run: |
+          npx remotion compositions --quiet | tr ' ' '\n' | grep . | sort > /tmp/found.txt
+          printf '%s\n' CirclePresenter ComponentsShowcase DocumentaryScene FullVideo FullVideoSubtitled Infographic MpscHistory MpscHistoryThumbnail NewsCard NumberCounter PhoneMockup PresenterScene Subtitles TalkingHeadTemplate TitleScene | sort > /tmp/expected.txt
+          cat /tmp/found.txt
+          missing=$(comm -23 /tmp/expected.txt /tmp/found.txt)
+          if [ -n "$missing" ]; then echo "::error::Missing compositions: $missing"; exit 1; fi
+      - name: Render a still from every composition
+        run: |
+          mkdir -p out/ci-stills
+          for id in $(npx remotion compositions --quiet); do
+            npx remotion still "$id" "out/ci-stills/$id.png" --frame=45 --log=error
+            echo "ok $id"
+          done
+      - name: Render a 3 s MpscHistory clip with audio (render:final settings)
+        run: |
+          npx remotion render MpscHistory out/ci-mpsc.mp4 --frames=0-89 --codec=h264 --crf=16 \
+            --pixel-format=yuv420p --image-format=jpeg --jpeg-quality=95 --audio-codec=aac --audio-bitrate=320k
+          npx remotion ffprobe -v error -show_entries stream=codec_name,width,height -of compact out/ci-mpsc.mp4 | tee /tmp/probe.txt
+          grep -q "codec_name=h264|width=1080|height=1920" /tmp/probe.txt && grep -q "codec_name=aac" /tmp/probe.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: video-stills
+          path: apps/video/out/ci-stills
+          if-no-files-found: ignore
+
+  # ---------------------------------------------------------------------------
+  # Educational platform (web + Android + shared packages)
+  # ---------------------------------------------------------------------------
+  check:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      NEXT_TELEMETRY_DISABLED: 1
+      EXPO_NO_TELEMETRY: 1
+      EXPO_OFFLINE: 1
+      CI: 1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+
+      - name: Typecheck all workspaces
+        run: npm run typecheck
+      - name: Unit tests (shared core)
+        run: npm test
+
+      - name: Build web (Next.js)
+        run: npm run build:web
+      - name: Bundle Android app (Metro/Hermes)
+        run: npm run export:android
+      - name: Export mobile app for web preview
+        run: npm run export:web -w @edu/mobile
+
+      - name: Install Playwright Chromium
+        run: npm install --no-save --no-audit --no-fund playwright@1.63.0 && npx playwright install --with-deps chromium
+      - name: Web end-to-end smoke test
+        run: |
+          (cd apps/web && npx next start -p 3100 &) && npx wait-on@8.0.3 http://localhost:3100 --timeout 60000
+          BASE_URL=http://localhost:3100 SCREENSHOT_DIR=../../screenshots node apps/web/e2e/smoke.mjs
+      - name: Mobile end-to-end smoke test
+        working-directory: apps/mobile
+        run: |
+          (node e2e/serve.mjs dist/web 8090 &) && sleep 1
+          BASE_URL=http://localhost:8090 SCREENSHOT_DIR=../../screenshots node e2e/smoke.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: screenshots
+          path: screenshots
+          if-no-files-found: ignore

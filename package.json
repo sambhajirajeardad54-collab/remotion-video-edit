@@ -1,39 +1,31 @@
 {
-  "name": "sam-xplains",
-  "version": "1.0.0",
-  "description": "My Remotion video",
-  "repository": {},
+  "name": "edu-platform",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Coaching institute platform (web + Android) and the Sam Xplains Remotion video studio, in one repository.",
   "license": "UNLICENSED",
   "engines": {
-    "node": "^20.19.0 || ^22.13.0 || >=24"
+    "node": "^22.12.0 || >=24"
   },
-  "private": true,
-  "dependencies": {
-    "@remotion/cli": "4.0.543",
-    "@remotion/fonts": "4.0.543",
-    "@remotion/media": "4.0.543",
-    "@remotion/transitions": "4.0.543",
-    "react": "19.3.1",
-    "react-dom": "19.3.1",
-    "remotion": "4.0.543",
-    "zod": "4.6.7"
+  "workspaces": [
+    "apps/web",
+    "apps/mobile",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:web": "npm run dev -w @edu/web",
+    "dev:mobile": "npm run start -w @edu/mobile",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "build:web": "npm run build -w @edu/web",
+    "export:android": "npm run export:android -w @edu/mobile",
+    "check": "npm run typecheck && npm run test && npm run build:web && npm run export:android",
+    "video:install": "npm ci --prefix apps/video",
+    "video:dev": "npm run dev --prefix apps/video",
+    "video:lint": "npm run lint --prefix apps/video",
+    "video:render": "npm run render:final --prefix apps/video --"
   },
   "devDependencies": {
-    "@remotion/eslint-config-flat": "4.0.543",
-    "@types/react": "19.3.0",
-    "@types/web": "0.0.166",
-    "eslint": "10.12.0",
-    "prettier": "3.8.1",
     "typescript": "5.9.3"
-  },
-  "scripts": {
-    "dev": "remotion studio",
-    "build": "remotion bundle",
-    "upgrade": "remotion upgrade",
-    "lint": "eslint src && tsc",
-    "render:final": "bash scripts/workflow/render-final.sh"
-  },
-  "allowScripts": {
-    "esbuild": false
   }
 }
