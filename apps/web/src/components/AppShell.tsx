@@ -6,6 +6,7 @@ import { BookOpen, ClipboardCheck, FileText, House, Languages, UserRound } from 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
+import { Wordmark } from './Logo';
 
 const NAV = [
   { href: '/', key: 'home', Icon: House },
@@ -30,14 +31,8 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className="shell">
       <aside className="sidebar" aria-label="Main">
-        <Link href="/" className="brand">
-          <span className="brand-mark" aria-hidden>
-            {L(brand.shortName).slice(0, 1)}
-          </span>
-          <span className="brand-text">
-            <strong>{L(brand.name)}</strong>
-            <small>MPSC · DMER</small>
-          </span>
+        <Link href="/" className="brand-link" aria-label={L(brand.name)}>
+          <Wordmark size={40} subtitle="MPSC · DMER" />
         </Link>
         <nav className="side-nav">
           {NAV.map(({ href, key, Icon }) => (
@@ -47,16 +42,15 @@ export function AppShell({ children }: { children: ReactNode }) {
             </Link>
           ))}
         </nav>
-        <div className="sidebar-foot">{L(brand.tagline)}</div>
+        <div className="sidebar-foot">
+          <span className="tagline">{L(brand.tagline)}</span>
+        </div>
       </aside>
 
       <div className="main">
         <header className="topbar">
-          <Link href="/" className="brand brand-compact">
-            <span className="brand-mark" aria-hidden>
-              {L(brand.shortName).slice(0, 1)}
-            </span>
-            <strong>{L(brand.name)}</strong>
+          <Link href="/" className="brand-link brand-compact" aria-label={L(brand.name)}>
+            <Wordmark size={34} />
           </Link>
           <div className="topbar-actions">
             <button type="button" className="lang-toggle" onClick={toggleLocale} aria-label={`Switch language to ${m.common.switchLanguage}`} data-testid="lang-toggle">

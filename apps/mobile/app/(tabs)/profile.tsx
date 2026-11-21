@@ -4,7 +4,8 @@ import { colors, radii, spacing } from '@edu/design';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useMemo } from 'react';
 import { Alert, View } from 'react-native';
-import { Button, Card, Chips, Row, Screen, T } from '@/ui';
+import { router } from 'expo-router';
+import { Badge, Button, Card, Chips, Row, Screen, T } from '@/ui';
 
 export default function ProfileScreen() {
   const { state, dispatch, m, L, f, locale } = useStudent();
@@ -72,6 +73,18 @@ export default function ProfileScreen() {
             { value: 'en', label: 'English' },
           ]}
         />
+      </Card>
+
+      <Card style={{ gap: spacing.md }} testID="account-card">
+        <Row>
+          <T variant="heading">{m.auth.account}</T>
+          <Badge tone="accent" label={m.auth.preview} />
+        </Row>
+        <T variant="small">{m.auth.accountNote}</T>
+        <Row gap={spacing.md}>
+          <Button label={m.auth.login} onPress={() => router.push('/login')} style={{ flex: 1 }} testID="open-login" />
+          <Button label={m.auth.createAccount} variant="outline" onPress={() => router.push('/register')} style={{ flex: 1 }} />
+        </Row>
       </Card>
 
       <Card style={{ gap: spacing.md }}>

@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  brand,
   buildDashboard,
   dayPart,
   exams,
@@ -15,6 +16,7 @@ import { useStudent } from '@edu/core/react';
 import { ArrowRight, BookOpenCheck, CalendarClock, Flame, Megaphone, PlayCircle, Target, Timer, Trophy } from 'lucide-react';
 import Link from 'next/link';
 import { useMemo } from 'react';
+import { BrandMark } from '@/components/Logo';
 import { Badge, Card, Chips, ExamBadge, ProgressBar, ProgressRing, SectionHeader, StatTile, WhenReady } from '@/components/ui';
 
 export default function DashboardPage() {
@@ -36,7 +38,11 @@ function Dashboard() {
   return (
     <div className="stack-lg" data-testid="dashboard">
       <section className="hero">
+        <div className="hero-watermark" aria-hidden>
+          <BrandMark size={260} tile={false} />
+        </div>
         <div className="hero-main">
+          <p className="hero-tagline">{L(brand.tagline)}</p>
           <p className="hero-date">{formatDate(today, locale, true)}</p>
           <h1>
             {m.greeting[dayPart(today)]}, {firstName}

@@ -22,6 +22,8 @@ function RootStack() {
         <Stack.Screen name="course/[id]" options={{ title: m.nav.courses }} />
         <Stack.Screen name="test/[id]" options={{ title: m.nav.tests }} />
         <Stack.Screen name="material/[id]" options={{ title: m.nav.material }} />
+        <Stack.Screen name="login" options={{ title: m.auth.login }} />
+        <Stack.Screen name="register" options={{ title: m.auth.createAccount }} />
       </Stack>
     </>
   );

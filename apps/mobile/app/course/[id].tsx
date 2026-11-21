@@ -44,7 +44,7 @@ export default function CourseScreen() {
             <Ionicons name="person" size={20} color={colors.accentStrong} />
           </View>
           <View style={{ flex: 1 }}>
-            <T variant="eyebrow" style={{ color: '#FFD29E' }}>
+            <T variant="eyebrow" style={{ color: colors.accentOnDark }}>
               {m.courses.instructor}
             </T>
             <T style={{ color: '#fff', fontWeight: '700' }}>{L(course.instructor.name)}</T>

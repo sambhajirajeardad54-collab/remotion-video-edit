@@ -189,18 +189,6 @@ button:disabled {
   gap: var(--space-sm);
   color: var(--color-primary-strong);
 }
-.brand-mark {
-  display: grid;
-  place-items: center;
-  width: 36px;
-  height: 36px;
-  border-radius: var(--radius-md);
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-strong) 100%);
-  color: #fff;
-  font-weight: 700;
-  font-size: var(--text-lg);
-  box-shadow: inset 0 -3px 0 var(--color-accent);
-}
 .brand-text {
   display: flex;
   flex-direction: column;
@@ -302,10 +290,6 @@ button:disabled {
   }
   .sidebar .brand {
     color: #fff;
-  }
-  .sidebar .brand-mark {
-    background: #fff;
-    color: var(--color-primary-strong);
   }
   .sidebar .brand-text small {
     color: rgba(255, 255, 255, 0.6);
@@ -545,7 +529,7 @@ a.card:hover {
 .progress-fill {
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, var(--color-accent) 0%, #f8a94a 100%);
+  background: linear-gradient(90deg, var(--color-accent) 0%, var(--color-accent-on-dark) 100%);
   transition: width 0.4s ease;
 }
 
@@ -717,7 +701,7 @@ a.card:hover {
   border-radius: var(--radius-xl);
   color: #fff;
   background:
-    radial-gradient(120% 140% at 100% 0%, rgba(242, 140, 27, 0.22) 0%, transparent 45%),
+    radial-gradient(120% 140% at 100% 0%, rgba(201, 162, 39, 0.24) 0%, transparent 45%),
     linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-strong) 70%);
   position: relative;
   overflow: hidden;
@@ -778,8 +762,8 @@ a.card:hover {
   margin-top: var(--space-sm);
   padding: 4px 12px;
   border-radius: var(--radius-pill);
-  background: rgba(242, 140, 27, 0.18);
-  color: #ffd29e;
+  background: rgba(201, 162, 39, 0.18);
+  color: var(--color-accent-on-dark);
   font-weight: 600;
   font-size: var(--text-sm);
 }
@@ -991,7 +975,7 @@ a.card:hover {
   flex-direction: column;
 }
 .instructor .eyebrow {
-  color: #ffd29e;
+  color: var(--color-accent-on-dark);
 }
 .course-side {
   align-items: center;
@@ -1282,4 +1266,157 @@ a.card:hover {
   color: #fff !important;
   border-color: rgba(255, 255, 255, 0.45) !important;
   background: rgba(255, 255, 255, 0.08);
+}
+
+/* ---------- Lakshya Academy brand ---------- */
+
+.brand-link {
+  display: inline-flex;
+}
+/* The compact top-bar logo is for phones; the sidebar shows the logo on wide screens. */
+@media (min-width: 900px) {
+  .brand-link.brand-compact {
+    display: none;
+  }
+}
+.brand-mark-svg {
+  display: inline-flex;
+  flex-shrink: 0;
+  line-height: 0;
+}
+.brand-mark-svg svg {
+  width: 100%;
+  height: 100%;
+}
+.tagline {
+  font-weight: 600;
+  color: var(--color-accent-strong);
+}
+.sidebar .tagline {
+  color: var(--color-accent-on-dark);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+.hero-tagline {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--color-accent-on-dark);
+}
+.hero-watermark {
+  position: absolute;
+  right: -30px;
+  top: -30px;
+  opacity: 0.07;
+  pointer-events: none;
+  z-index: 0;
+}
+.course-hero {
+  position: relative;
+  overflow: hidden;
+}
+.course-hero > :not(.hero-watermark) {
+  position: relative;
+  z-index: 1;
+}
+.page-header h1 {
+  position: relative;
+  padding-bottom: 6px;
+}
+.page-header h1::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 44px;
+  height: 3px;
+  border-radius: 3px;
+  background: var(--color-accent);
+}
+
+/* ---------- Sign-in / registration previews ---------- */
+
+.auth {
+  max-width: 480px;
+}
+.auth-card {
+  padding: 0;
+  overflow: hidden;
+  gap: 0;
+}
+.auth-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-xxl) var(--space-lg);
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-strong) 100%);
+  border-bottom: 3px solid var(--color-accent);
+  text-align: center;
+}
+.auth-name {
+  color: #fff;
+  font-size: var(--text-xl);
+}
+.auth-brand .tagline {
+  color: var(--color-accent-on-dark);
+}
+.auth-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding: var(--space-xl);
+}
+.auth-footer {
+  text-align: center;
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.field label,
+.field-label {
+  font-weight: 600;
+  font-size: var(--text-sm);
+}
+.input {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 var(--space-md);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font: inherit;
+  color: var(--color-text);
+  background: var(--color-surface);
+}
+.input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-soft);
+}
+.input[aria-invalid='true'] {
+  border-color: var(--color-danger);
+}
+.input-group {
+  display: flex;
+}
+.input-group .input {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+.input-prefix {
+  display: grid;
+  place-items: center;
+  padding: 0 var(--space-md);
+  border: 1.5px solid var(--color-border);
+  border-right: none;
+  border-radius: var(--radius-md) 0 0 var(--radius-md);
+  background: var(--color-surface-muted);
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+.field-error {
+  font-size: var(--text-xs);
+  color: var(--color-danger);
 }
