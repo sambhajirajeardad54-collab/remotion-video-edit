@@ -81,3 +81,9 @@ export function dayPart(date: Date): DayPart {
   if (h < 17) return 'afternoon';
   return 'evening';
 }
+
+/** Indian mobile number: 10 digits starting 6–9, optional +91/0 prefix and spaces. */
+export function normalizeIndianMobile(input: string): string | null {
+  const digits = input.replace(/[\s-]/g, '').replace(/^(\+91|91|0)(?=\d{10}$)/, '');
+  return /^[6-9]\d{9}$/.test(digits) ? digits : null;
+}

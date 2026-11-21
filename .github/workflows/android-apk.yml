@@ -6,6 +6,11 @@ name: Android APK
 
 on:
   workflow_dispatch:
+    inputs:
+      android_package:
+        description: 'Android package ID (leave empty for the placeholder com.lakshyaacademy.app). Cannot change after Play Store release.'
+        required: false
+        default: ''
 
 permissions:
   contents: read
@@ -33,6 +38,7 @@ jobs:
       - name: Link EAS project and build APK
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          ANDROID_PACKAGE: ${{ inputs.android_package }}
         run: |
           npx eas-cli@27.11.0 init --non-interactive --force
           npx eas-cli@27.11.0 build --platform android --profile preview --non-interactive --no-wait

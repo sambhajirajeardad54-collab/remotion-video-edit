@@ -3,7 +3,8 @@
 import { APP_VERSION, brand, buildDashboard, exams, formatDate, parseDayKey, sampleStudent, type ExamId, type Locale } from '@edu/core';
 import { useStudent } from '@edu/core/react';
 import { useMemo } from 'react';
-import { Card, Chips, PageHeader, StatTile, WhenReady } from '@/components/ui';
+import Link from 'next/link';
+import { Badge, Card, Chips, PageHeader, StatTile, WhenReady } from '@/components/ui';
 import { BookOpenCheck, Flame, MapPin, ShieldCheck, Target, Trophy } from 'lucide-react';
 
 export default function ProfilePage() {
@@ -68,6 +69,22 @@ function Profile() {
             { value: 'en', label: 'English' },
           ]}
         />
+      </Card>
+
+      <Card className="stack" data-testid="account-card">
+        <div className="row gap">
+          <h2 className="h3">{m.auth.account}</h2>
+          <Badge tone="accent">{m.auth.preview}</Badge>
+        </div>
+        <p className="small muted">{m.auth.accountNote}</p>
+        <div className="row gap">
+          <Link href="/login" className="btn btn-primary">
+            {m.auth.login}
+          </Link>
+          <Link href="/register" className="btn btn-outline">
+            {m.auth.createAccount}
+          </Link>
+        </div>
       </Card>
 
       <Card className="stack">

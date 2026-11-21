@@ -5,6 +5,7 @@ import { useStudent } from '@edu/core/react';
 import { ArrowLeft, Check, CheckCircle2, Circle, FileText, HelpCircle, Info, PlayCircle, Star, Users } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
+import { BrandMark } from '@/components/Logo';
 import { Badge, Card, EmptyState, ExamBadge, ProgressRing, WhenReady } from '@/components/ui';
 
 const kindIcon = { video: PlayCircle, notes: FileText, quiz: HelpCircle } as const;
@@ -36,6 +37,9 @@ function CourseDetail() {
       </Link>
 
       <section className="course-hero">
+        <div className="hero-watermark" aria-hidden>
+          <BrandMark size={220} tile={false} />
+        </div>
         <div className="stack">
           <div className="row-badges">
             {course.examIds.map((eid) => (

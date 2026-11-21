@@ -65,7 +65,9 @@ export function StudentProvider({ storage, children, initialLocale, onLocaleChan
   }, [state, ready]);
 
   const onLocaleChangeRef = useRef(onLocaleChange);
-  onLocaleChangeRef.current = onLocaleChange;
+  useEffect(() => {
+    onLocaleChangeRef.current = onLocaleChange;
+  }, [onLocaleChange]);
   useEffect(() => {
     onLocaleChangeRef.current?.(state.locale);
   }, [state.locale]);

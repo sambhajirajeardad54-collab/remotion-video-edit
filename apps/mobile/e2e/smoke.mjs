@@ -74,6 +74,15 @@ await shot(page, 'test-result');
 await page.goto(BASE);
 await page.getByText('Continue learning').waitFor();
 check(await page.getByText('Tests taken').isVisible(), 'dashboard stats visible after test');
+check(await page.getByText('Your goal, our guidance!').first().isVisible(), 'tagline on dashboard');
+
+// Sign-in preview reached from Profile (design-only)
+await page.getByRole('tab', { name: 'Profile' }).click();
+await page.getByTestId('open-login').click();
+await page.getByTestId('auth-preview-note').waitFor();
+await page.getByTestId('login-mobile').fill('12345');
+check(await page.getByText('Enter a valid 10-digit Indian mobile number').isVisible(), 'invalid mobile number flagged');
+await shot(page, 'login');
 
 check(errors.length === 0, `no page errors${errors.length ? ': ' + errors.join(' | ') : ''}`);
 await browser.close();

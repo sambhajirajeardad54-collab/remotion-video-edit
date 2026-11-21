@@ -12,6 +12,7 @@ import {
   messages,
   mockTests,
   nextLesson,
+  normalizeIndianMobile,
   parseStoredState,
   scoreAttempt,
   serializeState,
@@ -137,6 +138,16 @@ describe('formatting', () => {
     expect(formatClock(-3)).toBe('00:00');
     expect(formatTime('10:00', 'en')).toBe('10:00 AM');
     expect(formatTime('18:30', 'mr')).toBe('सायं. 6:30');
+  });
+});
+
+describe('mobile numbers', () => {
+  it('accepts valid Indian mobile numbers in common formats', () => {
+    for (const n of ['9876543210', '+91 98765 43210', '098765-43210', '91 6123456789'])
+      expect(normalizeIndianMobile(n)).toMatch(/^[6-9]\d{9}$/);
+  });
+  it('rejects invalid numbers', () => {
+    for (const n of ['', '12345', '5876543210', '98765432101', 'abcdefghij']) expect(normalizeIndianMobile(n)).toBeNull();
   });
 });
 

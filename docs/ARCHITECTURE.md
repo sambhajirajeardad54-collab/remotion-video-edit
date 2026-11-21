@@ -58,11 +58,12 @@ Components are deliberately *not* shared through react-native-web: native-feelin
 | Layer | How |
 | --- | --- |
 | Shared logic & content integrity | Vitest, `packages/core/test` (21 tests) |
+| Lint | ESLint 9 per workspace: `eslint-config-next`, `eslint-config-expo`, `typescript-eslint` + React Hooks rules (the video studio keeps its own ESLint 10 config) |
 | Types | `tsc` in every workspace |
 | Web | `next build` + Playwright smoke test at phone and desktop sizes (`apps/web/e2e`) |
 | Android | `expo export --platform android` (Metro + Hermes bytecode) + the same flows driven through react-native-web (`apps/mobile/e2e`) |
 
-| Video studio | Separate CI job: isolated install, React 19.3.1 check, `npm run lint` (eslint + tsc), all 15 compositions present, a still of each, a 3 s MpscHistory render with audio |
+| Video studio | Separate CI job: guard that flags any change under `apps/video`, isolated install, React 19.3.1 check, `npm run lint` (eslint + tsc), all 15 compositions present, a still of each, a 3 s MpscHistory render with audio |
 
 All of it runs in GitHub Actions on every push.
 

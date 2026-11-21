@@ -101,7 +101,22 @@ async function run(viewport, label) {
 
   check(errors.length === 0, `no console/page errors${errors.length ? `: ${errors.join(' | ')}` : ''}`);
 
-  // 7. Unknown routes give a friendly 404.
+  // 7. Brand + sign-in / registration previews (design-only: nothing is submitted).
+  await page.goto(`${BASE}/login`);
+  await page.getByTestId('auth-preview-note').waitFor();
+  check(await page.locator('.auth-brand .tagline').isVisible() && (await page.locator('.auth-brand .tagline').innerText()) === 'Your goal, our guidance!', 'English tagline shown');
+  await page.getByTestId('login-mobile').fill('12345');
+  check(await page.getByText('Enter a valid 10-digit Indian mobile number').isVisible(), 'invalid mobile number flagged');
+  await page.getByTestId('login-mobile').fill('98765 43210');
+  check((await page.getByText('Enter a valid 10-digit Indian mobile number').count()) === 0, 'valid mobile number accepted');
+  check(await page.getByRole('button', { name: /Send OTP/ }).isDisabled(), 'sign-in button is disabled (preview)');
+  await page.getByRole('link', { name: 'Create an account' }).click();
+  await page.getByTestId('register-mobile').waitFor();
+  check(await page.getByRole('button', { name: /Create account/ }).isDisabled(), 'registration button is disabled (preview)');
+  check(!(await page.evaluate(() => JSON.stringify(localStorage)).then((s) => s.includes('98765'))), 'typed details are not stored');
+  await shot(page, `${label}-register`);
+
+  // 8. Unknown routes give a friendly 404.
   const res = await page.goto(`${BASE}/does-not-exist`);
   check(res?.status() === 404, '404 for unknown route');
 

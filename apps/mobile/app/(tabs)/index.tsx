@@ -1,4 +1,4 @@
-import { buildDashboard, dayPart, exams, formatDate, formatShortDate, formatTime, lessonCount, sampleStudent, type ExamId } from '@edu/core';
+import { brand, buildDashboard, dayPart, exams, formatDate, formatShortDate, formatTime, lessonCount, sampleStudent, type ExamId } from '@edu/core';
 import { useStudent } from '@edu/core/react';
 import { colors, radii, spacing } from '@edu/design';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -18,6 +18,9 @@ export default function Dashboard() {
   return (
     <Screen>
       <HeroPanel>
+        <T variant="small" style={{ color: colors.accentOnDark, fontWeight: '700' }}>
+          {L(brand.tagline)}
+        </T>
         <T variant="small" style={{ color: 'rgba(255,255,255,0.7)' }}>
           {formatDate(today, locale, true)}
         </T>
@@ -30,8 +33,8 @@ export default function Dashboard() {
         </Row>
         <Chips<ExamId> dark value={state.targetExam} onChange={(examId) => dispatch({ type: 'setTargetExam', examId })} options={exams.map((e) => ({ value: e.id, label: L(e.shortName) }))} />
         <View style={s.streak}>
-          <Ionicons name="flame" size={16} color="#FFD29E" />
-          <T variant="small" style={{ color: '#FFD29E', fontWeight: '700' }}>
+          <Ionicons name="flame" size={16} color={colors.accentOnDark} />
+          <T variant="small" style={{ color: colors.accentOnDark, fontWeight: '700' }}>
             {d.streak > 0 ? f(m.dashboard.streak, { n: d.streak }) : m.dashboard.streakNone}
           </T>
         </View>
@@ -193,7 +196,7 @@ function Stat({ icon, value, label }: { icon: React.ComponentProps<typeof Ionico
 }
 
 const s = StyleSheet.create({
-  streak: { flexDirection: 'row', alignItems: 'center', gap: 6, alignSelf: 'flex-start', paddingHorizontal: 12, paddingVertical: 4, borderRadius: radii.pill, backgroundColor: 'rgba(242,140,27,0.18)' },
+  streak: { flexDirection: 'row', alignItems: 'center', gap: 6, alignSelf: 'flex-start', paddingHorizontal: 12, paddingVertical: 4, borderRadius: radii.pill, backgroundColor: 'rgba(201,162,39,0.18)' },
   heroCard: { backgroundColor: '#fff', borderRadius: radii.lg, padding: spacing.lg, gap: spacing.sm, marginTop: spacing.sm },
   stats: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.md },
   stat: { flexBasis: '47%', flexGrow: 1, flexDirection: 'row', alignItems: 'center', gap: spacing.md, backgroundColor: colors.surface, borderRadius: radii.lg, borderWidth: 1, borderColor: colors.border, padding: spacing.md },

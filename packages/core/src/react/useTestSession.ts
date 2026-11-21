@@ -39,10 +39,11 @@ export function useTestSession(test: MockTest | undefined, onSubmit: (attempt: T
   const [now, setNow] = useState(() => Date.now());
   const [timedOut, setTimedOut] = useState(false);
 
-  const answersRef = useRef(answers);
-  answersRef.current = answers;
+  // Keep the latest callback without re-creating timers; updated after render, never during it.
   const onSubmitRef = useRef(onSubmit);
-  onSubmitRef.current = onSubmit;
+  useEffect(() => {
+    onSubmitRef.current = onSubmit;
+  }, [onSubmit]);
   /** Guards against recording one attempt twice (e.g. tap on Submit as the timer hits zero). */
   const submittedRef = useRef(false);
 
@@ -57,12 +58,12 @@ export function useTestSession(test: MockTest | undefined, onSubmit: (attempt: T
       setTimedOut(byTimer);
       onSubmitRef.current({
         testId: test.id,
-        answers: answersRef.current,
+        answers,
         startedAt: new Date(startedAt).toISOString(),
         submittedAt: new Date().toISOString(),
       });
     },
-    [test, startedAt],
+    [test, startedAt, answers],
   );
 
   useEffect(() => {

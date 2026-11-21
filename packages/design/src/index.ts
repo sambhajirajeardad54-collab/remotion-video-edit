@@ -3,8 +3,9 @@
  *  - web reads them as CSS custom properties (see `toCssVariables`)
  *  - mobile reads them directly in StyleSheet objects
  *
- * Palette: deep navy (trust, seriousness), white space, and a restrained
- * saffron accent used only for highlights, progress and calls to action.
+ * Lakshya Academy palette: deep navy (trust, seriousness), white space and
+ * classic gold (achievement) for highlights, progress and calls to action.
+ * Gold text on white uses gold700 so it stays readable (WCAG AA).
  */
 
 export const palette = {
@@ -18,12 +19,13 @@ export const palette = {
   navy100: '#E3E9F6',
   navy50: '#F3F6FC',
 
-  saffron700: '#B85A00',
-  saffron600: '#D96D00',
-  saffron500: '#F28C1B',
-  saffron400: '#F8A94A',
-  saffron100: '#FFEBD3',
-  saffron50: '#FFF7EE',
+  gold700: '#8A6D0B',
+  gold600: '#A8850F',
+  gold500: '#C9A227',
+  gold300: '#E6C766',
+  gold100: '#F6EBC6',
+  gold50: '#FBF5E0',
+  bronze600: '#A0621A',
 
   white: '#FFFFFF',
   slate900: '#111827',
@@ -54,9 +56,11 @@ export const colors = {
   primaryStrong: palette.navy900,
   primarySoft: palette.navy100,
 
-  accent: palette.saffron500,
-  accentStrong: palette.saffron700,
-  accentSoft: palette.saffron50,
+  accent: palette.gold500,
+  accentStrong: palette.gold700,
+  accentSoft: palette.gold50,
+  /** Gold for text and icons on navy backgrounds. */
+  accentOnDark: palette.gold300,
 
   success: palette.green600,
   successSoft: palette.green50,
@@ -143,7 +147,7 @@ export const layout = {
 /** Accent colour per exam, used for badges and course card stripes. */
 export const examColors = {
   'mpsc-group-c': palette.navy700,
-  'mpsc-group-d': palette.saffron600,
+  'mpsc-group-d': palette.bronze600,
   dmer: '#0E7C7B',
 } as const;
 
@@ -167,3 +171,4 @@ export function toCssVariables(): string {
 }
 
 export const tokens = { palette, colors, spacing, radii, typography, shadows, layout, examColors };
+export * from './brand';

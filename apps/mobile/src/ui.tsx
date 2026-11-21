@@ -1,10 +1,10 @@
-import { getExam, type ExamId } from '@edu/core';
+import { brand, getExam, type ExamId } from '@edu/core';
 import { useStudent } from '@edu/core/react';
-import { colors, examColors, radii, shadows, spacing, typography } from '@edu/design';
-import type { ReactNode } from 'react';
+import { brandMarkSvg, colors, examColors, radii, shadows, spacing, typography } from '@edu/design';
+import { useId, useMemo, type ReactNode } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View, type StyleProp, type TextProps, type ViewStyle } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Svg, { Circle } from 'react-native-svg';
+import Svg, { Circle, SvgXml } from 'react-native-svg';
 
 type Variant = 'display' | 'title' | 'heading' | 'body' | 'small' | 'caption' | 'eyebrow';
 
@@ -25,9 +25,7 @@ export function T({ variant = 'body', style, ...rest }: TextProps & { variant?: 
 export function Screen({ children, scroll = true }: { children: ReactNode; scroll?: boolean }) {
   const { ready } = useStudent();
   const body = !ready ? (
-    <View style={styles.loading}>
-      <ActivityIndicator color={colors.primary} />
-    </View>
+    <BrandLoading />
   ) : scroll ? (
     <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
       {children}
@@ -208,7 +206,6 @@ export function Ticks({ items }: { items: string[] }) {
 export const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.background },
   scroll: { padding: spacing.lg, paddingBottom: spacing.huge, gap: spacing.xxl },
-  loading: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   card: {
     backgroundColor: colors.surface,
     borderRadius: radii.lg,
@@ -232,12 +229,15 @@ export const styles = StyleSheet.create({
   button: { minHeight: 48, paddingHorizontal: spacing.xl, borderRadius: radii.md, alignItems: 'center', justifyContent: 'center', borderWidth: 1 },
 });
 
-/** Navy hero block with a subtle saffron glow, shared by dashboard and course screens. */
+/** Navy hero block with a subtle gold glow, shared by dashboard and course screens. */
 export function HeroPanel({ children }: { children: ReactNode }) {
   return (
     <View style={heroStyles.hero}>
       <View style={heroStyles.glow} />
       <View style={heroStyles.ring} />
+      <View style={heroStyles.watermark} pointerEvents="none">
+        <BrandMark size={200} tile={false} />
+      </View>
       <View style={{ gap: spacing.sm }}>{children}</View>
     </View>
   );
@@ -245,6 +245,36 @@ export function HeroPanel({ children }: { children: ReactNode }) {
 
 const heroStyles = StyleSheet.create({
   hero: { backgroundColor: colors.primary, borderRadius: radii.xl, padding: spacing.xl, overflow: 'hidden' },
-  glow: { position: 'absolute', top: -80, right: -80, width: 220, height: 220, borderRadius: 110, backgroundColor: 'rgba(242,140,27,0.16)' },
+  glow: { position: 'absolute', top: -80, right: -80, width: 220, height: 220, borderRadius: 110, backgroundColor: 'rgba(201,162,39,0.16)' },
+  watermark: { position: 'absolute', top: -24, right: -24, opacity: 0.08 },
   ring: { position: 'absolute', bottom: -70, left: -50, width: 180, height: 180, borderRadius: 90, borderWidth: 24, borderColor: 'rgba(255,255,255,0.04)' },
+});
+
+/** The Lakshya target mark, rendered from the shared geometry in @edu/design. */
+export function BrandMark({ size = 32, tile = true }: { size?: number; tile?: boolean }) {
+  const prefix = `lk${useId().replace(/[^a-zA-Z0-9]/g, '')}`;
+  const xml = useMemo(
+    () => brandMarkSvg({ size, background: tile ? 'tile' : 'none', scale: tile ? 0.84 : 1, idPrefix: prefix }),
+    [size, tile, prefix],
+  );
+  return <SvgXml xml={xml} width={size} height={size} />;
+}
+
+/** Shown while saved progress loads: continues the native splash with the wordmark and tagline. */
+export function BrandLoading() {
+  const { L } = useStudent();
+  return (
+    <View style={brandStyles.loading} testID="brand-loading">
+      <BrandMark size={96} tile={false} />
+      <Text style={brandStyles.name}>{L(brand.name)}</Text>
+      <Text style={brandStyles.tagline}>{L(brand.tagline)}</Text>
+      <ActivityIndicator color={colors.accent} style={{ marginTop: spacing.xl }} />
+    </View>
+  );
+}
+
+const brandStyles = StyleSheet.create({
+  loading: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: spacing.sm, backgroundColor: colors.primaryStrong, padding: spacing.xl },
+  name: { color: '#fff', fontSize: typography.size.xxl, fontWeight: '700', marginTop: spacing.md },
+  tagline: { color: colors.accentOnDark, fontSize: typography.size.md, fontWeight: '600', textAlign: 'center' },
 });

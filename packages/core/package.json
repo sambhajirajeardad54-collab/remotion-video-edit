@@ -11,13 +11,16 @@
   },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json",
-    "test": "vitest run"
+    "test": "vitest run",
+    "lint": "eslint ."
   },
   "devDependencies": {
     "@types/react": "~19.3.0",
     "react": "19.3.0",
     "typescript": "5.9.3",
-    "vitest": "5.1.1"
+    "vitest": "5.1.1",
+    "typescript-eslint": "8.73.0",
+    "eslint-plugin-react-hooks": "7.1.1"
   },
   "peerDependencies": {
     "react": "*"

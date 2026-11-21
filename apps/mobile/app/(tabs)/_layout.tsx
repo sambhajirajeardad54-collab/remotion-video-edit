@@ -5,6 +5,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { Tabs } from 'expo-router';
 import type { ComponentProps } from 'react';
 import { Pressable, Text, View, type ColorValue } from 'react-native';
+import { BrandMark } from '@/ui';
 
 type IconName = ComponentProps<typeof Ionicons>['name'];
 
@@ -28,9 +29,7 @@ function BrandTitle() {
   const { L } = useStudent();
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-      <View style={{ width: 32, height: 32, borderRadius: 9, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center', borderBottomWidth: 3, borderBottomColor: colors.accent }}>
-        <Text style={{ color: colors.primaryStrong, fontWeight: '800', fontSize: 16 }}>{L(brand.shortName).slice(0, 1)}</Text>
-      </View>
+      <BrandMark size={32} />
       <Text style={{ color: '#fff', fontWeight: '700', fontSize: 17 }}>{L(brand.name)}</Text>
     </View>
   );
